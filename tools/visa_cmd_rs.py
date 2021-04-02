@@ -5,118 +5,6 @@ from typing import List, Dict
 from tools.function import *
 from tools.visa import VisaConnection
 
-def lte_aclr(v: VisaConnection, rf_params: Dict[str, str],
-             rel: float = 25, atten: int = 5,
-             current: str = None, rename: str = None,
-             exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
-    """
-    INST:CRE:NEW LTE, 'LTE'
-    :param v:
-    :param rf_params:
-    :param rel:
-    :param atten:
-    :param current:
-    :param rename:
-    :param exs:
-    :param snap:
-    :param snappath:
-    :param delay:
-    :return: [power, offset(-bw), offset(+bw), offset(-2*bw), offset(+2*bw)]
-    """
-    freq = rf_params.get('freq')
-    loss = rf_params.get('loss')
-    bandwidth = rf_params.get('bandwidth')
-    mode = rf_params.get('mode')
-    t_mode = "E-" + mode + "__" + bandwidth + "MHz"
-
-    if current is not None:
-        v.send_cmd("INST '%s'" % current)
-        if rename is not None:
-            v.send_cmd("INST:REN '%s','%s'" % (current, rename))
-
-    v.send_cmd("CONF:LTE:MEAS ACLR")
-    v.send_cmd("MMEM:LOAD:CC:TMOD:DL '%s'" % t_mode)
-
-    if exs:
-        v.send_cmd("TRIG:SOUR EXT")
-        v.send_cmd("SENS:SWE:EGAT ON")
-    v.send_cmd("FREQ:CENT %sMHz" % freq)
-    v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
-    v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
-    v.send_cmd("INP:ATT %ddB" % atten)
-
-    # v.send_cmd("INIT:CONT OFF")
-    # v.send_cmd("INIT;*WAI")
-    time.sleep(delay)
-
-    if snap:
-        v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
-        v.send_cmd("HCOP:DEV:LANG1 JPG")
-        v.send_cmd("HCOP:CMAP:DEF4")
-        v.send_cmd("MMEM:NAME '%s'" % snappath)
-        v.send_cmd("HCOP:IMM1")
-
-    res = v.rec_cmd("CALC:MARK:FUNC:POW:RES? ACP").split(",")
-    return strlist_to_floatlist(res)
-
-
-def lte_multi_aclr(v: VisaConnection, rf_params: Dict[str, str],
-             rel: float = 25, atten: int = 5,
-             current: str = None, rename: str = None,
-             exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
-
-    freq = rf_params.get('freq')
-    loss = rf_params.get('loss')
-    bandwidth = rf_params.get('bandwidth')
-    mode = rf_params.get('mode')
-    bw1 = re.match("(.\d+)", bandwidth).group(1)
-    if bandwidth.find("gap") > -1:
-        gap = re.search("gap(.\d+)", bandwidth).group(1)
-        bw2 = re.search("\+(.\d+)", bandwidth).group(1)
-    else:
-        gap = "0"
-        bw2 = re.search("\+(.\d+)", bandwidth).group(1)
-    t_mode = "E-" + mode + "__" + bw1 + "MHz"
-
-    if current is not None:
-        v.send_cmd("INST '%s'" % current)
-        if rename is not None:
-            v.send_cmd("INST:REN '%s','%s'" % (current, rename))
-
-    v.send_cmd("CONF:LTE:MEAS MCAClr")
-    v.send_cmd("MMEM:LOAD:CC:TMOD:DL '%s'" % t_mode)
-    v.send_cmd("CONF:LTE:NOCC 2")
-    v.send_cmd("CONF:LTE:DL:CC:BW BW%s_00" % bw1)
-    v.send_cmd("CONF:LTE:DL:CC2:BW BW%s_00" % bw2)
-    offset1 = int((float(freq) - float(bw2) / 2 - float(gap) / 2) * 1e6)
-    offset2 = int((float(freq) + float(bw1) / 2 + float(gap) / 2) * 1e6)
-    v.send_cmd("SENS:FREQ:CENT:CC %d" % offset1)
-    v.send_cmd("SENS:FREQ:CENT:CC2 %d" % offset2)
-
-    if exs:
-        v.send_cmd("TRIG:SOUR EXT")
-        v.send_cmd("SENS:SWE:EGAT ON")
-    v.send_cmd("FREQ:CENT %sMHz" % freq)
-    v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
-    v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
-    v.send_cmd("INP:ATT %ddB" % atten)
-
-    # v.send_cmd("INIT:CONT OFF")
-    # v.send_cmd("INIT;*WAI")
-    time.sleep(delay)
-
-    if snap:
-        v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
-        v.send_cmd("HCOP:DEV:LANG1 JPG")
-        v.send_cmd("HCOP:CMAP:DEF4")
-        v.send_cmd("MMEM:NAME '%s'" % snappath)
-        v.send_cmd("HCOP:IMM1")
-
-    res = v.rec_cmd("CALC:MARK:FUNC:POW:RES? MCAC").split(",")
-    # s2 = v.rec_cmd("CALC:MARK:FUNC:POW:RES? GACL")
-    # s3 = v.rec_cmd("CALC:MARK:FUNC:POW:RES? MACM")
-    return strlist_to_floatlist(res)
-
 
 def obw(v: VisaConnection, rf_params: Dict[str, str], span: int,
         rel: float = 25, atten: int = 20, rbw: int = 30, count: int = 10001, point: int = 10001,
@@ -318,6 +206,119 @@ def se(v: VisaConnection, rf_params: Dict[str, str],
     return res2
 
 
+def lte_aclr(v: VisaConnection, rf_params: Dict[str, str],
+             rel: float = 25, atten: int = 5,
+             current: str = None, rename: str = None,
+             exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
+    """
+    INST:CRE:NEW LTE, 'LTE'
+    :param v:
+    :param rf_params:
+    :param rel:
+    :param atten:
+    :param current:
+    :param rename:
+    :param exs:
+    :param snap:
+    :param snappath:
+    :param delay:
+    :return: [power, offset(-bw), offset(+bw), offset(-2*bw), offset(+2*bw)]
+    """
+    freq = rf_params.get('freq')
+    loss = rf_params.get('loss')
+    bandwidth = rf_params.get('bandwidth')
+    mode = rf_params.get('mode')
+    t_mode = "E-" + mode + "__" + bandwidth + "MHz"
+
+    if current is not None:
+        v.send_cmd("INST '%s'" % current)
+        if rename is not None:
+            v.send_cmd("INST:REN '%s','%s'" % (current, rename))
+
+    v.send_cmd("CONF:LTE:MEAS ACLR")
+    v.send_cmd("MMEM:LOAD:CC:TMOD:DL '%s'" % t_mode)
+
+    if exs:
+        v.send_cmd("TRIG:SOUR EXT")
+        v.send_cmd("SENS:SWE:EGAT ON")
+    v.send_cmd("FREQ:CENT %sMHz" % freq)
+    v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
+    v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
+    v.send_cmd("INP:ATT %ddB" % atten)
+
+    # v.send_cmd("INIT:CONT OFF")
+    # v.send_cmd("INIT;*WAI")
+    time.sleep(delay)
+
+    if snap:
+        v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
+        v.send_cmd("HCOP:DEV:LANG1 JPG")
+        v.send_cmd("HCOP:CMAP:DEF4")
+        v.send_cmd("MMEM:NAME '%s'" % snappath)
+        v.send_cmd("HCOP:IMM1")
+
+    res = v.rec_cmd("CALC:MARK:FUNC:POW:RES? ACP").split(",")
+    return strlist_to_floatlist(res)
+
+
+def lte_multi_aclr(v: VisaConnection, rf_params: Dict[str, str],
+                   rel: float = 25, atten: int = 5,
+                   current: str = None, rename: str = None,
+                   exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
+
+    freq = rf_params.get('freq')
+    loss = rf_params.get('loss')
+    bandwidth = rf_params.get('bandwidth')
+    mode = rf_params.get('mode')
+    bw1 = re.match("(.\d+)", bandwidth).group(1)
+    if bandwidth.find("gap") > -1:
+        gap = re.search("gap(.\d+)", bandwidth).group(1)
+        bw2 = re.search("\+(.\d+)", bandwidth).group(1)
+    else:
+        gap = "0"
+        bw2 = re.search("\+(.\d+)", bandwidth).group(1)
+    t_mode = "E-" + mode + "__" + bw1 + "MHz"
+
+    if current is not None:
+        v.send_cmd("INST '%s'" % current)
+        if rename is not None:
+            v.send_cmd("INST:REN '%s','%s'" % (current, rename))
+
+    v.send_cmd("CONF:LTE:MEAS MCAClr")
+    v.send_cmd("MMEM:LOAD:CC:TMOD:DL '%s'" % t_mode)
+    v.send_cmd("CONF:LTE:NOCC 2")
+    v.send_cmd("CONF:LTE:DL:CC:BW BW%s_00" % bw1)
+    v.send_cmd("CONF:LTE:DL:CC2:BW BW%s_00" % bw2)
+    offset1 = int((float(freq) - float(bw2) / 2 - float(gap) / 2) * 1e6)
+    offset2 = int((float(freq) + float(bw1) / 2 + float(gap) / 2) * 1e6)
+    v.send_cmd("SENS:FREQ:CENT:CC %d" % offset1)
+    v.send_cmd("SENS:FREQ:CENT:CC2 %d" % offset2)
+
+    if exs:
+        v.send_cmd("TRIG:SOUR EXT")
+        v.send_cmd("SENS:SWE:EGAT ON")
+    v.send_cmd("FREQ:CENT %sMHz" % freq)
+    v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
+    v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
+    v.send_cmd("INP:ATT %ddB" % atten)
+
+    # v.send_cmd("INIT:CONT OFF")
+    # v.send_cmd("INIT;*WAI")
+    time.sleep(delay)
+
+    if snap:
+        v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
+        v.send_cmd("HCOP:DEV:LANG1 JPG")
+        v.send_cmd("HCOP:CMAP:DEF4")
+        v.send_cmd("MMEM:NAME '%s'" % snappath)
+        v.send_cmd("HCOP:IMM1")
+
+    res = v.rec_cmd("CALC:MARK:FUNC:POW:RES? MCAC").split(",")
+    # s2 = v.rec_cmd("CALC:MARK:FUNC:POW:RES? GACL")
+    # s3 = v.rec_cmd("CALC:MARK:FUNC:POW:RES? MACM")
+    return strlist_to_floatlist(res)
+
+
 def lte_evm(v: VisaConnection, rf_params: Dict[str, str],
             rel: float = 25, atten: int = 20,
             current: str = None, rename: str = None,
@@ -438,9 +439,9 @@ def lte_evm(v: VisaConnection, rf_params: Dict[str, str],
 
 
 def lte_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
-            rel: float = 25, atten: int = 20,
-            current: str = None, rename: str = None,
-            exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[List[float]]:
+                  rel: float = 25, atten: int = 20,
+                  current: str = None, rename: str = None,
+                  exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[List[float]]:
 
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -466,8 +467,8 @@ def lte_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
     v.send_cmd("CONF:LTE:DL:CC2:BW BW%s_00" % bw2)
     offset1 = int((float(freq) - float(bw2) / 2 - float(gap) / 2) * 1e6)
     offset2 = int((float(freq) + float(bw1) / 2 + float(gap) / 2) * 1e6)
-    v.send_cmd("SENS:FREQ:CENT:CC %s" % offset1)
-    v.send_cmd("SENS:FREQ:CENT:CC2 %s" % offset2)
+    v.send_cmd("SENS:FREQ:CENT:CC %d" % offset1)
+    v.send_cmd("SENS:FREQ:CENT:CC2 %d" % offset2)
 
 
     if exs:
@@ -574,16 +575,109 @@ def lte_sem(v: VisaConnection, rf_params: Dict[str, str],
     loss = rf_params.get('loss')
     bandwidth = rf_params.get('bandwidth')
     mode = rf_params.get('mode')
-    wave_dict = {"20_31": "E-TM3_1__20MHz", "20_31a": "E-TM3_1A__20MHz", "20_2": "E-TM2__20MHz",
-                 "20_2a": "E-TM2A__20MHz"}
+    t_mode = "E-" + mode + "__" + bandwidth + "MHz"
+
     if current is not None:
         v.send_cmd("INST '%s'" % current)
         if rename is not None:
             v.send_cmd("INST:REN '%s','%s'" % (current, rename))
 
     v.send_cmd("CONF:LTE:MEAS ESP")
-    v.send_cmd(
-        "MMEM:LOAD:CC:TMOD:DL '%s'" % wave_dict.get(str(int(bandwidth)) + "_" + mode))
+    v.send_cmd("MMEM:LOAD:CC:TMOD:DL '%s'" % t_mode)
+
+    if exs:
+        v.send_cmd("TRIG:SOUR EXT")
+        v.send_cmd("SENS:SWE:EGAT ON")
+
+    v.send_cmd("FREQ:CENT %sMHz" % freq)
+    v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
+    v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
+    # v.send_cmd("INIT:CONT OFF")
+
+    v.send_cmd("SENS:ESP1:PRES:STAN 'C:\R_S\Instr\sem_std\EUTRA-LTE\SEM_DL_BW%s_00_LocalArea_FSW.xml'" % bandwidth)
+    v.send_cmd("SENS:ESP1:RANG2:DEL")
+    v.send_cmd("SENS:ESP1:RANG7:DEL")
+    v.send_cmd("SENS:ESP1:RANG1:FREQ:STOP -15050000")
+    v.send_cmd("SENS:ESP1:RANG7:FREQ:STAR 15050000")
+    v.send_cmd("SENS:ESP1:RANG7:FREQ:STAR 15050000")
+
+    for i in range(7):
+        v.send_cmd("SENS:ESP1:RANG%d:INP:ATT %d" % ((i + 1), atten))
+    v.send_cmd("SENS:ESP1:RANG2:LIM1:ABS:STAR -37")
+    v.send_cmd("SENS:ESP1:RANG2:LIM1:ABS:STOP -30")
+    v.send_cmd("SENS:ESP1:RANG6:LIM1:ABS:STAR -30")
+    v.send_cmd("SENS:ESP1:RANG6:LIM1:ABS:STOP -37")
+
+    # v.send_cmd("INIT:CONT OFF")
+    v.send_cmd("INIT;*WAI")
+    time.sleep(delay)
+
+    if snap:
+        v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
+        v.send_cmd("HCOP:DEV:LANG1 JPG")
+        v.send_cmd("HCOP:CMAP:DEF4")
+        v.send_cmd("MMEM:NAME '%s'" % snappath)
+        v.send_cmd("HCOP:IMM1")
+
+    res1 = v.rec_cmd("CALC:MARK:FUNC:POW:RES? CPOW")
+    res2 = v.rec_cmd("TRAC:DATA? LIST").split(",")
+    for i in range(4):
+        res2[1 + 11 * i: 5 + 11 * i] = hzlist_to_mhzlist(res2[1 + 11 * i: 5 + 11 * i])
+    res2.insert(0, res1)
+    res = strlist_to_floatlist(res2)
+    while 0.0 in res:
+        res.remove(0.0)
+    return res
+
+
+def lte_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
+                  rel: float = 25, atten: int = 12,
+                  current: str = None, rename: str = None,
+                  exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
+    """
+
+    :param v:
+    :param rf_params:
+    :param rel:
+    :param atten:
+    :param current:
+    :param rename:
+    :param exs:
+    :param snap:
+    :param snappath:
+    :param delay:
+    :return: [TxPower(dBm), Range No, Start Freq Rel(MHz), Stop Freq Rel(MHz), RBW(MHz),
+    Frequency at Delta to Limit(MHz), Power Abs(dBm), Power Rel(dB), Delta to Limit(dB), ...]
+    4 Ranges Totally
+    """
+    freq = rf_params.get('freq')
+    loss = rf_params.get('loss')
+    bandwidth = rf_params.get('bandwidth')
+    mode = rf_params.get('mode')
+    bw1 = re.match("(.\d+)", bandwidth).group(1)
+    if bandwidth.find("gap") > -1:
+        gap = re.search("gap(.\d+)", bandwidth).group(1)
+        bw2 = re.search("\+(.\d+)", bandwidth).group(1)
+    else:
+        gap = "0"
+        bw2 = re.search("\+(.\d+)", bandwidth).group(1)
+    t_mode = "E-" + mode + "__" + bw1 + "MHz"
+
+    if current is not None:
+        v.send_cmd("INST '%s'" % current)
+        if rename is not None:
+            v.send_cmd("INST:REN '%s','%s'" % (current, rename))
+
+    v.send_cmd("CONF:LTE:MEAS MCESpectrum")
+    v.send_cmd("MMEM:LOAD:CC:TMOD:DL '%s'" % t_mode)
+    v.send_cmd("CONF:LTE:NOCC 2")
+    v.send_cmd("CONF:LTE:DL:CC:BW BW%s_00" % bw1)
+    v.send_cmd("CONF:LTE:DL:CC2:BW BW%s_00" % bw2)
+    offset1 = int((float(freq) - float(bw2) / 2 - float(gap) / 2) * 1e6)
+    offset2 = int((float(freq) + float(bw1) / 2 + float(gap) / 2) * 1e6)
+    v.send_cmd("SENS:FREQ:CENT:CC %d" % offset1)
+    v.send_cmd("SENS:FREQ:CENT:CC2 %d" % offset2)
+
 
     if exs:
         v.send_cmd("TRIG:SOUR EXT")
@@ -689,9 +783,9 @@ def nr5g_aclr(v: VisaConnection, rf_params: Dict[str, str],
 
 
 def nr5g_multi_aclr(v: VisaConnection, rf_params: Dict[str, str],
-              rel: float = 25, atten: int = 5,
-              current: str = None, rename: str = None,
-              exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
+                    rel: float = 25, atten: int = 5,
+                    current: str = None, rename: str = None,
+                    exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
 
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -718,8 +812,8 @@ def nr5g_multi_aclr(v: VisaConnection, rf_params: Dict[str, str],
     v.send_cmd("CONF:NR5G:DL:CC2:BW BW%s" % bw2)
     offset1 = int((float(freq) - float(bw2) / 2 - float(gap) / 2) * 1e6)
     offset2 = int((float(freq) + float(bw1) / 2 + float(gap) / 2) * 1e6)
-    v.send_cmd("SENS:FREQ:CENT:CC1 %s" % offset1)
-    v.send_cmd("SENS:FREQ:CENT:CC2 %s" % offset2)
+    v.send_cmd("SENS:FREQ:CENT:CC1 %d" % offset1)
+    v.send_cmd("SENS:FREQ:CENT:CC2 %d" % offset2)
 
 
     if exs:
@@ -781,18 +875,15 @@ def nr5g_evm(v: VisaConnection, rf_params: Dict[str, str],
     loss = rf_params.get('loss')
     bandwidth = rf_params.get('bandwidth')
     mode = rf_params.get('mode')
-    wave_dict = {"100_31": "NR-FR1-TM3_1__TDD_100MHz_30kHz", "100_31a": "NR-FR1-TM3_1a__TDD_100MHz_30kHz",
-                 "100_2": "NR-FR1-TM2__TDD_100MHz_30kHz", "100_2a": "NR-FR1-TM2a__TDD_100MHz_30kHz",
-                 "20_31": "NR-FR1-TM3_1__TDD_20MHz_30kHz", "20_31a": "NR-FR1-TM3_1a__TDD_20MHz_30kHz",
-                 "20_2": "NR-FR1-TM2__TDD_20MHz_30kHz", "20_2a": "NR-FR1-TM2a__TDD_20MHz_30kHz"}
+    t_mode = "NR-FR1-" + mode + "__TDD_" + bandwidth + "_30kHz"
+
     if current is not None:
         v.send_cmd("INST '%s'" % current)
         if rename is not None:
             v.send_cmd("INST:REN '%s','%s'" % (current, rename))
 
     v.send_cmd("CONF:NR5G:MEAS EVM")
-    v.send_cmd(
-        "MMEM:LOAD:TMOD:CC1 '%s'" % wave_dict.get(str(int(bandwidth)) + "_" + mode))
+    v.send_cmd("MMEM:LOAD:TMOD:CC1 '%s'" % t_mode)
 
     if exs:
         v.send_cmd("TRIG:SOUR EXT")
@@ -867,6 +958,139 @@ def nr5g_evm(v: VisaConnection, rf_params: Dict[str, str],
     return res
 
 
+def nr5g_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
+                   rel: float = 25, atten: int = 20,
+                   current: str = None, rename: str = None,
+                   exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[List[float]]:
+    """
+    INST:CRE:NEW NR5G, '5G NR'
+    :param v:
+    :param rf_params:
+    :param rel:
+    :param atten:
+    :param current:
+    :param rename:
+    :param exs:
+    :param snap:
+    :param snappath:
+    :param delay:
+    :return: [EVM PDSCH QPSK(%), EVM PDSCH 16QAM(%), EVM PDSCH 64QAM(%), EVM PDSCH 256QAM(%),
+                0                   1                   2                   3
+            EVM ALL(%), EVM Phys Channel(%), EVM Phys Signal(%),
+                4           5                   6
+            Frequency Error(Hz), Sampling Error(ppm),
+                7                   8
+            I/Q Offset(dB), I/Q Gain Imbalance(dB), I/Q Quadrature Error(¡ã),
+                9               10                      11
+            OSTP(dBm),
+                12
+            Power(dBm), Crest Factor(dB)]
+                13      14
+    """
+    freq = rf_params.get('freq')
+    loss = rf_params.get('loss')
+    bandwidth = rf_params.get('bandwidth')
+    mode = rf_params.get('mode')
+    bw1 = re.match("(.\d+)", bandwidth).group(1)
+    if bandwidth.find("gap") > -1:
+        gap = re.search("gap(.\d+)", bandwidth).group(1)
+        bw2 = re.search("\+(.\d+)", bandwidth).group(1)
+    else:
+        gap = "0"
+        bw2 = re.search("\+(.\d+)", bandwidth).group(1)
+    t_mode = "NR-FR1-" + mode + "__TDD_" + bw1 + "_30kHz"
+
+    if current is not None:
+        v.send_cmd("INST '%s'" % current)
+        if rename is not None:
+            v.send_cmd("INST:REN '%s','%s'" % (current, rename))
+
+    v.send_cmd("CONF:NR5G:MEAS EVM")
+    v.send_cmd("MMEM:LOAD:TMOD:CC1 '%s'" % t_mode)
+    v.send_cmd("CONF:NR5G:NOCC 2")
+    v.send_cmd("CONF:NR5G:DL:CC1:BW BW%s" % bw1)
+    v.send_cmd("CONF:NR5G:DL:CC2:BW BW%s" % bw2)
+    offset1 = int((float(freq) - float(bw2) / 2 - float(gap) / 2) * 1e6)
+    offset2 = int((float(freq) + float(bw1) / 2 + float(gap) / 2) * 1e6)
+    v.send_cmd("SENS:FREQ:CENT:CC1 %d" % offset1)
+    v.send_cmd("SENS:FREQ:CENT:CC2 %d" % offset2)
+
+    if exs:
+        v.send_cmd("TRIG:SOUR EXT")
+    v.send_cmd("FREQ:CENT %sMHz" % freq)
+    v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
+    v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
+    v.send_cmd("INP:ATT %ddB" % atten)
+
+    v.send_cmd("CONF:NR5G:DL:CC1:RFUC:STAT OFF")
+    v.send_cmd("LAY:REM:WIND '3'")
+    v.send_cmd("INIT:IMM;*WAI")
+    v.send_cmd("LAY:ADD:WIND? '4',LEFT,EVSY")
+
+    # v.send_cmd("INIT:CONT OFF")
+    # v.send_cmd("INIT;*WAI")
+    time.sleep(delay)
+
+    if snap:
+        v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
+        v.send_cmd("HCOP:DEV:LANG1 JPG")
+        v.send_cmd("HCOP:CMAP:DEF4")
+        v.send_cmd("MMEM:NAME '%s'" % snappath)
+        v.send_cmd("HCOP:IMM1")
+
+    res_list = []
+    for i in range(2):
+        evm_qpsk = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSQP:AVER?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSQP:MIN?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSQP:MAX?" % (i+1)))]
+        evm_16qam = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSST:AVER?" % (i+1))),
+                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSST:MIN?" % (i+1))),
+                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSST:MAX?" % (i+1)))]
+        evm_64qam = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSSF:AVER?" % (i+1))),
+                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSSF:MIN?" % (i+1))),
+                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSSF:MAX?" % (i+1)))]
+        evm_256qam = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSTS:AVER?" % (i+1))),
+                      str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSTS:MIN?" % (i+1))),
+                      str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSTS:MAX?" % (i+1)))]
+        evm_all = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:AVER?" % (i+1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:MIN?" % (i+1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:MAX?" % (i+1)))]
+        evm_pch = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PCH:AVER?" % (i+1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PCH:MIN?" % (i+1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PCH:MAX?" % (i+1)))]
+        evm_psig = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PSIG:AVER?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PSIG:MIN?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PSIG:MAX?" % (i+1)))]
+        evm_ferr = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:FERR:AVER?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:FERR:MIN?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:FERR:MAX?" % (i+1)))]
+        evm_serr = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:SERR:AVER?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:SERR:MIN?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:SERR:MAX?" % (i+1)))]
+        evm_iqof = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:IQOF:AVER?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:IQOF:MIN?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:IQOF:MAX?" % (i+1)))]
+        evm_gimb = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:GIMB:AVER?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:GIMB:MIN?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:GIMB:MAX?" % (i+1)))]
+        evm_quad = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:QUAD:AVER?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:QUAD:MIN?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:QUAD:MAX?" % (i+1)))]
+        evm_ostp = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:OSTP:AVER?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:OSTP:MIN?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:OSTP:MAX?" % (i+1)))]
+        evm_pow = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:POW:AVER?" % (i+1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:POW:MIN?" % (i+1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:POW:MAX?" % (i+1)))]
+        evm_cres = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:CRES:AVER?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:CRES:MIN?" % (i+1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:CRES:MAX?" % (i+1)))]
+        res = [evm_qpsk, evm_16qam, evm_64qam, evm_256qam, evm_all, evm_pch, evm_psig, evm_ferr, evm_serr, evm_iqof,
+               evm_gimb, evm_quad, evm_ostp, evm_pow, evm_cres]
+        res_list.append(res)
+    return res_list
+
+
 def nr5g_sem(v: VisaConnection, rf_params: Dict[str, str],
             rel: float = 25, atten: int = 12,
             current: str = None, rename: str = None,
@@ -891,20 +1115,115 @@ def nr5g_sem(v: VisaConnection, rf_params: Dict[str, str],
     loss = rf_params.get('loss')
     bandwidth = rf_params.get('bandwidth')
     mode = rf_params.get('mode')
-    wave_dict = {"100_31": "NR-FR1-TM3_1__TDD_100MHz_30kHz", "100_31a": "NR-FR1-TM3_1a__TDD_100MHz_30kHz",
-                 "100_2": "NR-FR1-TM2__TDD_100MHz_30kHz", "100_2a": "NR-FR1-TM2a__TDD_100MHz_30kHz",
-                 "20_31": "NR-FR1-TM3_1__TDD_20MHz_30kHz", "20_31a": "NR-FR1-TM3_1a__TDD_20MHz_30kHz",
-                 "20_2": "NR-FR1-TM2__TDD_20MHz_30kHz", "20_2a": "NR-FR1-TM2a__TDD_20MHz_30kHz"}
+    t_mode = "NR-FR1-" + mode + "__TDD_" + bandwidth + "_30kHz"
+
     if current is not None:
         v.send_cmd("INST '%s'" % current)
         if rename is not None:
             v.send_cmd("INST:REN '%s','%s'" % (current, rename))
 
     v.send_cmd("CONF:NR5G:MEAS ESP")
-    v.send_cmd(
-        "MMEM:LOAD:TMOD:CC1 '%s'" % wave_dict.get(str(int(bandwidth)) + "_" + mode))
+    v.send_cmd("MMEM:LOAD:TMOD:CC1 '%s'" % t_mode)
 
 
+
+    if exs:
+        v.send_cmd("TRIG:SOUR EXT")
+        v.send_cmd("SENS:SWE:EGAT ON")
+        v.send_cmd("SENS:SWE:EGAT:CONT:STAT ON")
+
+    v.send_cmd("FREQ:CENT %sMHz" % freq)
+    v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
+    v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
+    # v.send_cmd("INIT:CONT OFF")
+
+    v.send_cmd(r"SENS:ESP1:PRES:STAN 'C:\R_S\Instr\sem_std\NR5G\NR5G_SEM_DL_LocalArea_BW%s_BASESTATIONTYPE_1_C_FSW.xml'" % rf_params.get('bandwidth'))
+
+    v.send_cmd("SENS:ESP1:RANG2:DEL")
+    v.send_cmd("SENS:ESP1:RANG5:DEL")
+    if bandwidth == "20":
+        v.send_cmd("SENS:ESP1:RANG1:FREQ:STOP -15050000")
+        v.send_cmd("SENS:ESP1:RANG5:FREQ:STAR 15050000")
+    elif bandwidth == "100":
+        v.send_cmd("SENS:ESP1:RANG1:FREQ:STOP -55050000")
+        v.send_cmd("SENS:ESP1:RANG5:FREQ:STAR 55050000")
+
+    for i in range(5):
+        v.send_cmd("SENS:ESP1:RANG%d:INP:ATT %d" % ((i + 1), atten))
+    v.send_cmd("SENS:ESP1:RANG2:LIM1:ABS:STAR -37")
+    v.send_cmd("SENS:ESP1:RANG2:LIM1:ABS:STOP -30")
+    v.send_cmd("SENS:ESP1:RANG4:LIM1:ABS:STAR -30")
+    v.send_cmd("SENS:ESP1:RANG4:LIM1:ABS:STOP -37")
+
+
+    # v.send_cmd("INIT:CONT OFF")
+    v.send_cmd("INIT;*WAI")
+    time.sleep(delay)
+
+    if snap:
+        v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
+        v.send_cmd("HCOP:DEV:LANG1 JPG")
+        v.send_cmd("HCOP:CMAP:DEF4")
+        v.send_cmd("MMEM:NAME '%s'" % snappath)
+        v.send_cmd("HCOP:IMM1")
+
+    res1 = v.rec_cmd("CALC:MARK:FUNC:POW:RES? CPOW")
+    res2 = v.rec_cmd("TRAC:DATA? LIST").split(",")
+    for i in range(4):
+        res2[1 + 11 * i: 5 + 11 * i] = hzlist_to_mhzlist(res2[1 + 11 * i: 5 + 11 * i])
+    res2.insert(0, res1)
+    res = strlist_to_floatlist(res2)
+    while 0.0 in res:
+        res.remove(0.0)
+    return res
+
+
+def nr5g_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
+                   rel: float = 25, atten: int = 12,
+                   current: str = None, rename: str = None,
+                   exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
+    """
+
+    :param v:
+    :param rf_params:
+    :param rel:
+    :param atten:
+    :param current:
+    :param rename:
+    :param exs:
+    :param snap:
+    :param snappath:
+    :param delay:
+    :return: [TxPower(dBm), Range No, Start Freq Rel(MHz), Stop Freq Rel(MHz), RBW(MHz),
+    Frequency at Delta to Limit(MHz), Power Abs(dBm), Power Rel(dB), Delta to Limit(dB), ...]
+    4 Ranges Totally
+    """
+    freq = rf_params.get('freq')
+    loss = rf_params.get('loss')
+    bandwidth = rf_params.get('bandwidth')
+    mode = rf_params.get('mode')
+    bw1 = re.match("(.\d+)", bandwidth).group(1)
+    if bandwidth.find("gap") > -1:
+        gap = re.search("gap(.\d+)", bandwidth).group(1)
+        bw2 = re.search("\+(.\d+)", bandwidth).group(1)
+    else:
+        gap = "0"
+        bw2 = re.search("\+(.\d+)", bandwidth).group(1)
+    t_mode = "NR-FR1-" + mode + "__TDD_" + bw1 + "_30kHz"
+
+    if current is not None:
+        v.send_cmd("INST '%s'" % current)
+        if rename is not None:
+            v.send_cmd("INST:REN '%s','%s'" % (current, rename))
+
+    v.send_cmd("CONF:NR5G:MEAS MCESpectrum")
+    v.send_cmd("MMEM:LOAD:TMOD:CC1 '%s'" % t_mode)
+    v.send_cmd("CONF:NR5G:DL:CC1:BW BW%s" % bw1)
+    v.send_cmd("CONF:NR5G:DL:CC2:BW BW%s" % bw2)
+    offset1 = int((float(freq) - float(bw2) / 2 - float(gap) / 2) * 1e6)
+    offset2 = int((float(freq) + float(bw1) / 2 + float(gap) / 2) * 1e6)
+    v.send_cmd("SENS:FREQ:CENT:CC1 %d" % offset1)
+    v.send_cmd("SENS:FREQ:CENT:CC2 %d" % offset2)
 
     if exs:
         v.send_cmd("TRIG:SOUR EXT")
