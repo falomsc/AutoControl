@@ -265,7 +265,20 @@ def lte_multi_aclr(v: VisaConnection, rf_params: Dict[str, str],
                    rel: float = 25, atten: int = 5,
                    current: str = None, rename: str = None,
                    exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
+    """
 
+    :param v:
+    :param rf_params:
+    :param rel:
+    :param atten:
+    :param current:
+    :param rename:
+    :param exs:
+    :param snap:
+    :param snappath:
+    :param delay:
+    :return:
+    """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
     bandwidth = rf_params.get('bandwidth')
@@ -297,7 +310,6 @@ def lte_multi_aclr(v: VisaConnection, rf_params: Dict[str, str],
     if exs:
         v.send_cmd("TRIG:SOUR EXT")
         v.send_cmd("SENS:SWE:EGAT ON")
-    v.send_cmd("FREQ:CENT %sMHz" % freq)
     v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
     v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
     v.send_cmd("INP:ATT %ddB" % atten)
@@ -442,7 +454,20 @@ def lte_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
                   rel: float = 25, atten: int = 20,
                   current: str = None, rename: str = None,
                   exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[List[float]]:
+    """
 
+    :param v:
+    :param rf_params:
+    :param rel:
+    :param atten:
+    :param current:
+    :param rename:
+    :param exs:
+    :param snap:
+    :param snappath:
+    :param delay:
+    :return:
+    """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
     bandwidth = rf_params.get('bandwidth')
@@ -470,10 +495,8 @@ def lte_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
     v.send_cmd("SENS:FREQ:CENT:CC %d" % offset1)
     v.send_cmd("SENS:FREQ:CENT:CC2 %d" % offset2)
 
-
     if exs:
         v.send_cmd("TRIG:SOUR EXT")
-    v.send_cmd("FREQ:CENT %sMHz" % freq)
     v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
     v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
     v.send_cmd("INP:ATT %ddB" % atten)
@@ -494,58 +517,58 @@ def lte_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
 
     res_list = []
     for i in range(2):
-        evm_qpsk = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSQP:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSQP:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSQP:MAX?" % (i+1)))]
-        evm_16qam = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSST:AVER?" % (i+1))),
-                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSST:MIN?" % (i+1))),
-                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSST:MAX?" % (i+1)))]
-        evm_64qam = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSSF:AVER?" % (i+1))),
-                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSSF:MIN?" % (i+1))),
-                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSSF:MAX?" % (i+1)))]
-        evm_256qam = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSTS:AVER?" % (i+1))),
-                      str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSTS:MIN?" % (i+1))),
-                      str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSTS:MAX?" % (i+1)))]
-        evm_all = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:AVER?" % (i+1))),
-                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:MIN?" % (i+1))),
-                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:MAX?" % (i+1)))]
-        evm_pch = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PCH:AVER?" % (i+1))),
-                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PCH:MIN?" % (i+1))),
-                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PCH:MAX?" % (i+1)))]
-        evm_psig = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PSIG:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PSIG:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PSIG:MAX?" % (i+1)))]
-        evm_ferr = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:FERR:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:FERR:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:FERR:MAX?" % (i+1)))]
-        evm_serr = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:SERR:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:SERR:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:SERR:MAX?" % (i+1)))]
-        evm_iqof = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:IQOF:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:IQOF:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:IQOF:MAX?" % (i+1)))]
-        evm_gimb = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:GIMB:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:GIMB:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:GIMB:MAX?" % (i+1)))]
-        evm_quad = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:QUAD:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:QUAD:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:QUAD:MAX?" % (i+1)))]
-        evm_rstp = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:RSTP:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:RSTP:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:RSTP:MAX?" % (i+1)))]
-        evm_ostp = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:OSTP:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:OSTP:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:OSTP:MAX?" % (i+1)))]
-        evm_rssi = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:RSSI:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:RSSI:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:RSSI:MAX?" % (i+1)))]
-        evm_pow = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:POW:AVER?" % (i+1))),
-                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:POW:MIN?" % (i+1))),
-                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:POW:MAX?" % (i+1)))]
-        evm_cres = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:CRES:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:CRES:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:CRES:MAX?" % (i+1)))]
-        res = [evm_qpsk, evm_16qam, evm_64qam, evm_256qam, evm_all, evm_pch, evm_psig, evm_ferr, evm_serr, evm_iqof, 
+        evm_qpsk = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSQP:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSQP:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSQP:MAX?" % (i + 1)))]
+        evm_16qam = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSST:AVER?" % (i + 1))),
+                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSST:MIN?" % (i + 1))),
+                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSST:MAX?" % (i + 1)))]
+        evm_64qam = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSSF:AVER?" % (i + 1))),
+                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSSF:MIN?" % (i + 1))),
+                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSSF:MAX?" % (i + 1)))]
+        evm_256qam = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSTS:AVER?" % (i + 1))),
+                      str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSTS:MIN?" % (i + 1))),
+                      str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSTS:MAX?" % (i + 1)))]
+        evm_all = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:AVER?" % (i + 1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:MIN?" % (i + 1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:MAX?" % (i + 1)))]
+        evm_pch = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PCH:AVER?" % (i + 1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PCH:MIN?" % (i + 1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PCH:MAX?" % (i + 1)))]
+        evm_psig = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PSIG:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PSIG:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PSIG:MAX?" % (i + 1)))]
+        evm_ferr = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:FERR:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:FERR:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:FERR:MAX?" % (i + 1)))]
+        evm_serr = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:SERR:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:SERR:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:SERR:MAX?" % (i + 1)))]
+        evm_iqof = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:IQOF:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:IQOF:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:IQOF:MAX?" % (i + 1)))]
+        evm_gimb = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:GIMB:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:GIMB:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:GIMB:MAX?" % (i + 1)))]
+        evm_quad = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:QUAD:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:QUAD:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:QUAD:MAX?" % (i + 1)))]
+        evm_rstp = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:RSTP:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:RSTP:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:RSTP:MAX?" % (i + 1)))]
+        evm_ostp = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:OSTP:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:OSTP:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:OSTP:MAX?" % (i + 1)))]
+        evm_rssi = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:RSSI:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:RSSI:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:RSSI:MAX?" % (i + 1)))]
+        evm_pow = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:POW:AVER?" % (i + 1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:POW:MIN?" % (i + 1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:POW:MAX?" % (i + 1)))]
+        evm_cres = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:CRES:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:CRES:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:CRES:MAX?" % (i + 1)))]
+        res = [evm_qpsk, evm_16qam, evm_64qam, evm_256qam, evm_all, evm_pch, evm_psig, evm_ferr, evm_serr, evm_iqof,
                evm_gimb, evm_quad, evm_rstp, evm_ostp, evm_rssi, evm_pow, evm_cres]
         res_list.append(res)
     return res_list
@@ -678,12 +701,10 @@ def lte_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
     v.send_cmd("SENS:FREQ:CENT:CC %d" % offset1)
     v.send_cmd("SENS:FREQ:CENT:CC2 %d" % offset2)
 
-
     if exs:
         v.send_cmd("TRIG:SOUR EXT")
         v.send_cmd("SENS:SWE:EGAT ON")
 
-    v.send_cmd("FREQ:CENT %sMHz" % freq)
     v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
     v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
     # v.send_cmd("INIT:CONT OFF")
@@ -786,7 +807,20 @@ def nr5g_multi_aclr(v: VisaConnection, rf_params: Dict[str, str],
                     rel: float = 25, atten: int = 5,
                     current: str = None, rename: str = None,
                     exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
+    """
 
+    :param v:
+    :param rf_params:
+    :param rel:
+    :param atten:
+    :param current:
+    :param rename:
+    :param exs:
+    :param snap:
+    :param snappath:
+    :param delay:
+    :return:
+    """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
     bandwidth = rf_params.get('bandwidth')
@@ -815,11 +849,9 @@ def nr5g_multi_aclr(v: VisaConnection, rf_params: Dict[str, str],
     v.send_cmd("SENS:FREQ:CENT:CC1 %d" % offset1)
     v.send_cmd("SENS:FREQ:CENT:CC2 %d" % offset2)
 
-
     if exs:
         v.send_cmd("TRIG:SOUR EXT")
         v.send_cmd("SENS:SWE:EGAT ON")
-    v.send_cmd("FREQ:CENT %sMHz" % freq)
     v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
     v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
     v.send_cmd("INP:ATT %ddB" % atten)
@@ -1017,7 +1049,6 @@ def nr5g_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
 
     if exs:
         v.send_cmd("TRIG:SOUR EXT")
-    v.send_cmd("FREQ:CENT %sMHz" % freq)
     v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
     v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
     v.send_cmd("INP:ATT %ddB" % atten)
@@ -1040,51 +1071,51 @@ def nr5g_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
 
     res_list = []
     for i in range(2):
-        evm_qpsk = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSQP:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSQP:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSQP:MAX?" % (i+1)))]
-        evm_16qam = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSST:AVER?" % (i+1))),
-                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSST:MIN?" % (i+1))),
-                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSST:MAX?" % (i+1)))]
-        evm_64qam = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSSF:AVER?" % (i+1))),
-                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSSF:MIN?" % (i+1))),
-                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSSF:MAX?" % (i+1)))]
-        evm_256qam = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSTS:AVER?" % (i+1))),
-                      str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSTS:MIN?" % (i+1))),
-                      str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSTS:MAX?" % (i+1)))]
-        evm_all = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:AVER?" % (i+1))),
-                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:MIN?" % (i+1))),
-                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:MAX?" % (i+1)))]
-        evm_pch = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PCH:AVER?" % (i+1))),
-                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PCH:MIN?" % (i+1))),
-                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PCH:MAX?" % (i+1)))]
-        evm_psig = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PSIG:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PSIG:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PSIG:MAX?" % (i+1)))]
-        evm_ferr = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:FERR:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:FERR:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:FERR:MAX?" % (i+1)))]
-        evm_serr = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:SERR:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:SERR:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:SERR:MAX?" % (i+1)))]
-        evm_iqof = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:IQOF:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:IQOF:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:IQOF:MAX?" % (i+1)))]
-        evm_gimb = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:GIMB:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:GIMB:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:GIMB:MAX?" % (i+1)))]
-        evm_quad = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:QUAD:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:QUAD:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:QUAD:MAX?" % (i+1)))]
-        evm_ostp = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:OSTP:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:OSTP:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:OSTP:MAX?" % (i+1)))]
-        evm_pow = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:POW:AVER?" % (i+1))),
-                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:POW:MIN?" % (i+1))),
-                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:POW:MAX?" % (i+1)))]
-        evm_cres = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:CRES:AVER?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:CRES:MIN?" % (i+1))),
-                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:CRES:MAX?" % (i+1)))]
+        evm_qpsk = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSQP:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSQP:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSQP:MAX?" % (i + 1)))]
+        evm_16qam = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSST:AVER?" % (i + 1))),
+                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSST:MIN?" % (i + 1))),
+                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSST:MAX?" % (i + 1)))]
+        evm_64qam = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSSF:AVER?" % (i + 1))),
+                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSSF:MIN?" % (i + 1))),
+                     str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSSF:MAX?" % (i + 1)))]
+        evm_256qam = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSTS:AVER?" % (i + 1))),
+                      str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSTS:MIN?" % (i + 1))),
+                      str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:DSTS:MAX?" % (i + 1)))]
+        evm_all = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:AVER?" % (i + 1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:MIN?" % (i + 1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:MAX?" % (i + 1)))]
+        evm_pch = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PCH:AVER?" % (i + 1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PCH:MIN?" % (i + 1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PCH:MAX?" % (i + 1)))]
+        evm_psig = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PSIG:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PSIG:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:EVM:PSIG:MAX?" % (i + 1)))]
+        evm_ferr = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:FERR:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:FERR:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:FERR:MAX?" % (i + 1)))]
+        evm_serr = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:SERR:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:SERR:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:SERR:MAX?" % (i + 1)))]
+        evm_iqof = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:IQOF:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:IQOF:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:IQOF:MAX?" % (i + 1)))]
+        evm_gimb = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:GIMB:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:GIMB:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:GIMB:MAX?" % (i + 1)))]
+        evm_quad = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:QUAD:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:QUAD:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:QUAD:MAX?" % (i + 1)))]
+        evm_ostp = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:OSTP:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:OSTP:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:OSTP:MAX?" % (i + 1)))]
+        evm_pow = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:POW:AVER?" % (i + 1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:POW:MIN?" % (i + 1))),
+                   str_to_float(v.rec_cmd("FETC:CC%d:SUMM:POW:MAX?" % (i + 1)))]
+        evm_cres = [str_to_float(v.rec_cmd("FETC:CC%d:SUMM:CRES:AVER?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:CRES:MIN?" % (i + 1))),
+                    str_to_float(v.rec_cmd("FETC:CC%d:SUMM:CRES:MAX?" % (i + 1)))]
         res = [evm_qpsk, evm_16qam, evm_64qam, evm_256qam, evm_all, evm_pch, evm_psig, evm_ferr, evm_serr, evm_iqof,
                evm_gimb, evm_quad, evm_ostp, evm_pow, evm_cres]
         res_list.append(res)
@@ -1092,9 +1123,9 @@ def nr5g_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
 
 
 def nr5g_sem(v: VisaConnection, rf_params: Dict[str, str],
-            rel: float = 25, atten: int = 12,
-            current: str = None, rename: str = None,
-            exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
+             rel: float = 25, atten: int = 12,
+             current: str = None, rename: str = None,
+             exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
     """
 
     :param v:
@@ -1125,8 +1156,6 @@ def nr5g_sem(v: VisaConnection, rf_params: Dict[str, str],
     v.send_cmd("CONF:NR5G:MEAS ESP")
     v.send_cmd("MMEM:LOAD:TMOD:CC1 '%s'" % t_mode)
 
-
-
     if exs:
         v.send_cmd("TRIG:SOUR EXT")
         v.send_cmd("SENS:SWE:EGAT ON")
@@ -1137,7 +1166,9 @@ def nr5g_sem(v: VisaConnection, rf_params: Dict[str, str],
     v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
     # v.send_cmd("INIT:CONT OFF")
 
-    v.send_cmd(r"SENS:ESP1:PRES:STAN 'C:\R_S\Instr\sem_std\NR5G\NR5G_SEM_DL_LocalArea_BW%s_BASESTATIONTYPE_1_C_FSW.xml'" % rf_params.get('bandwidth'))
+    v.send_cmd(
+        r"SENS:ESP1:PRES:STAN 'C:\R_S\Instr\sem_std\NR5G\NR5G_SEM_DL_LocalArea_BW%s_BASESTATIONTYPE_1_C_FSW.xml'" % rf_params.get(
+            'bandwidth'))
 
     v.send_cmd("SENS:ESP1:RANG2:DEL")
     v.send_cmd("SENS:ESP1:RANG5:DEL")
@@ -1154,7 +1185,6 @@ def nr5g_sem(v: VisaConnection, rf_params: Dict[str, str],
     v.send_cmd("SENS:ESP1:RANG2:LIM1:ABS:STOP -30")
     v.send_cmd("SENS:ESP1:RANG4:LIM1:ABS:STAR -30")
     v.send_cmd("SENS:ESP1:RANG4:LIM1:ABS:STOP -37")
-
 
     # v.send_cmd("INIT:CONT OFF")
     v.send_cmd("INIT;*WAI")
@@ -1230,12 +1260,13 @@ def nr5g_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
         v.send_cmd("SENS:SWE:EGAT ON")
         v.send_cmd("SENS:SWE:EGAT:CONT:STAT ON")
 
-    v.send_cmd("FREQ:CENT %sMHz" % freq)
     v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
     v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
     # v.send_cmd("INIT:CONT OFF")
 
-    v.send_cmd(r"SENS:ESP1:PRES:STAN 'C:\R_S\Instr\sem_std\NR5G\NR5G_SEM_DL_LocalArea_BW%s_BASESTATIONTYPE_1_C_FSW.xml'" % rf_params.get('bandwidth'))
+    v.send_cmd(
+        r"SENS:ESP1:PRES:STAN 'C:\R_S\Instr\sem_std\NR5G\NR5G_SEM_DL_LocalArea_BW%s_BASESTATIONTYPE_1_C_FSW.xml'" % rf_params.get(
+            'bandwidth'))
 
     v.send_cmd("SENS:ESP1:RANG2:DEL")
     v.send_cmd("SENS:ESP1:RANG5:DEL")
@@ -1252,7 +1283,6 @@ def nr5g_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
     v.send_cmd("SENS:ESP1:RANG2:LIM1:ABS:STOP -30")
     v.send_cmd("SENS:ESP1:RANG4:LIM1:ABS:STAR -30")
     v.send_cmd("SENS:ESP1:RANG4:LIM1:ABS:STOP -37")
-
 
     # v.send_cmd("INIT:CONT OFF")
     v.send_cmd("INIT;*WAI")
