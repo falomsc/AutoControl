@@ -1,0 +1,83 @@
+//------------Preparing the measurement-------------
+*RST
+//Resets the instrument
+
+SWE:MODE LIST
+//Activates spurious emissions measurement
+
+INIT:CONT OFF
+//Selects single sweep mode.
+
+//Spurious measurement has to be in single sweep mode to be configured
+//and no sweep operation may be running!
+
+// If required, a sweep stop can be ensured by INIT:IMM;*WAI
+
+//---------------Configuring a Sweep List----------
+
+LIST:RANG:COUNt?
+//Returns the number of measurement ranges in the sweep list.
+LIST:RANG4:DEL
+//Deletes the fourth range.
+LIST:RANG1:STAR 10000000
+//Defines a start frequency of 10 MHz for range 1.
+LIST:RANG1:STOP 100000000
+//Defines a stop frequency of 100 MHz for range 1.
+LIST:RANG1:BAND 500000
+//Defines a resolution bandwidth of 500 kHz in range 1.
+LIST:RANG1:BAND:VID 5000000
+//Defines a video bandwidth of 5 MHz for range 1.
+LIST:RANG1:INP:ATT:AUTO OFF
+//Turns automatic selection of the input attenuation in range 1 off.
+
+LIST:RANG1:INP:ATT 10
+//Defines a input attenuation of 10 dBm for range 1.
+
+
+LIST:RANG1:FILT:TYPE CFILter
+//Selects an Channel filter for range 1.
+LIST:RANG1:DET SAMP
+//Selects a sample detector for range 1.
+LIST:RANG1:POIN 601
+//Defines 601 sweep points for range 1.
+LIST:RANG1:RLEV -20
+//Defines a reference level of -20 dBm for range 1.
+LIST:RANG1:SWE:TIME 5
+//Defines a manual sweep time of 5 second for range 1.
+
+// Create a transducer that can be used.
+// It has to cover the corresponding frequency range
+//
+SENSe1:CORRection:TRANsducer:SELect 'Test'
+SENSe1:CORRection:TRANsducer:UNIT 'DB'
+SENSe1:CORRection:TRANsducer:COMMent 'Test Transducer'
+// Frequency Span 0 MHz to 20 Ghz
+SENSe1:CORRection:TRANsducer:DATA 0e6,5, 20e9,3
+
+SENS:LIST:RANG1:TRAN 'Test'
+//Includes a transducer called 'Test' for range 1.
+
+LIST:RANG1:LIM:STAR 10
+LIST:RANG1:LIM:STOP 10
+//Defines an absolute limit of 10 dBm at the start and stop frequencies of range 1.
+LIST:RANG:LIM:STAT ON
+//Turns the limit check for all ranges on.
+
+//---------------Configuring the List Evaluation----------
+CALC:PSE:MARG 100
+//Sets the threshold to 100 dB.
+CALC:PSE:PSH ON
+//Marks all peaks in the diagram with blue squares.
+CALC:PSE:SUBR 10
+//Sets 10 peaks per range to be stored in the list.
+
+//--------------Performing the Measurement-----
+
+INIT:SPUR; *WAI
+//Performs a spurious emission measurement and waits until the sweep has finished.
+
+//---------------Retrieving Results-------------
+CALC:LIM1:FAIL?
+//Queries the result of the check for limit line 1.
+TRAC? SPUR
+//Queries the peak list of the spurious emission measurement.

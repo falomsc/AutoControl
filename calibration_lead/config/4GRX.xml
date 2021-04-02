@@ -1,0 +1,74 @@
+<setup>
+    <pipe pip="1">
+        <branch id="4">
+            <fre freq="2505">
+                <power start="195" stop="213" step="2">-20</power>
+                <power start="215" stop="235" step="2">-30</power>
+                <power start="237" stop="255" step="2">-40</power>
+            </fre>
+            <fre freq="2535">
+                <power start="195" stop="213" step="2">-20</power>
+                <power start="215" stop="235" step="2">-30</power>
+                <power start="237" stop="255" step="2">-40</power>
+            </fre>
+            <fre freq="2565">
+                <power start="195" stop="213" step="2">-20</power>
+                <power start="215" stop="235" step="2">-30</power>
+                <power start="237" stop="255" step="2">-40</power>
+            </fre>
+        </branch>
+        <branch id="5">
+            <fre freq="2505">
+                <power start="195" stop="213" step="2">-20</power>
+                <power start="215" stop="235" step="2">-30</power>
+                <power start="237" stop="255" step="2">-40</power>
+            </fre>
+            <fre freq="2535">
+                <power start="195" stop="213" step="2">-20</power>
+                <power start="215" stop="235" step="2">-30</power>
+                <power start="237" stop="255" step="2">-40</power>
+            </fre>
+            <fre freq="2565">
+                <power start="195" stop="213" step="2">-20</power>
+                <power start="215" stop="235" step="2">-30</power>
+                <power start="237" stop="255" step="2">-40</power>
+            </fre>
+        </branch>
+    </pipe>
+    <pipe pip="2">
+        <branch id="6">
+            <fre freq="1715">
+                <power start="195" stop="213" step="2">-20</power>
+                <power start="215" stop="235" step="2">-30</power>
+                <power start="237" stop="255" step="2">-40</power>
+            </fre>
+            <fre freq="1745">
+                <power start="195" stop="213" step="2">-20</power>
+                <power start="215" stop="235" step="2">-30</power>
+                <power start="237" stop="255" step="2">-40</power>
+            </fre>
+            <fre freq="1775">
+                <power start="195" stop="213" step="2">-20</power>
+                <power start="215" stop="235" step="2">-30</power>
+                <power start="237" stop="255" step="2">-40</power>
+            </fre>
+        </branch>
+        <branch id="7">
+            <fre freq="1715">
+                <power start="195" stop="213" step="2">-20</power>
+                <power start="215" stop="235" step="2">-30</power>
+                <power start="237" stop="255" step="2">-40</power>
+            </fre>
+            <fre freq="1745">
+                <power start="195" stop="213" step="2">-20</power>
+                <power start="215" stop="235" step="2">-30</power>
+                <power start="237" stop="255" step="2">-40</power>
+            </fre>
+            <fre freq="1775">
+                <power start="195" stop="213" step="2">-20</power>
+                <power start="215" stop="235" step="2">-30</power>
+                <power start="237" stop="255" step="2">-40</power>
+            </fre>
+        </branch>
+    </pipe>
+</setup>

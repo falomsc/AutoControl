@@ -1,0 +1,30 @@
+//-----------Preparing the measurement ------------
+//Reset the instrument
+*RST
+//-------------Configuring the Measurement-----------------------
+//Set the center frequency to 800 MHz.
+FREQ:CENT 800MHz
+//Set the reference level to -10 dBm.
+DISP:TRAC:Y:RLEV -10dBm
+//Activate occupied bandwidth measurement.
+CALC:MARK:FUNC:POW:SEL OBW
+//Set the percentage of power to 99%.
+POW:BWID 99PCT
+//Set the channel bandwidth to 21 kHz.
+POW:ACH:BAND 21kHz
+//Optimize the instrument settings according to the channel bandwidth.
+POW:ACH:PRES OBW
+//Determine the ideal reference level for the measurement.
+POW:ACH:PRES:RLEV
+//Set the trace detector to positive peak.
+DET APE
+
+//--------------Performing the Measurement-----
+//Select single sweep mode.INIT:CONT OFF
+
+//Initiate a new measurement and waits until the sweep has finished.
+INIT;*WAI
+
+//---------------Retrieving Results-------------
+//Return the occupied bandwidth.
+CALC:MARK:FUNC:POW:RES? OBW

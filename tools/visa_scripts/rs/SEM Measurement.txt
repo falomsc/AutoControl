@@ -1,0 +1,143 @@
+//-----------Preparing the measurement ------------
+//Reset the instrument
+*RST
+//------------ Preparing the measurement------------
+//Activate SEM Measurement
+SWE:MODE ESP
+
+//Selects single sweep mode.
+//SEM has to be in single sweep mode to be configured and no sweep operation
+//may be running!
+// If required, a sweep stop can be ensured by INIT:IMM;*WAI
+INIT:CONT OFF
+
+
+//------------ Managing Measurement Configurations----------
+//Load the 3GPP configuration stored in the file '3GPP_UL.xml'
+ESP:PRES 'WCDMA\3GPP\UL\3GPP_UL.xml'
+
+//------------ Defining the Reference Range-----------------
+//Query the current reference range.
+ESP:RRAN?
+//Select the channel power as the power reference.
+ESP:RTYP CPOW
+//Define a channel bandwidth of 4 MHz for the power reference.
+ESP:BWID 4 MHZ
+//Use an RRC filter with a roll-off factor of 0.5 when measuring
+//the reference power.
+ESP:FILT:RRC ON
+ESP:FILT:ALPH 0.5
+
+//------------ Configuring Power Classes--------------------
+//Define 3 power classes.
+CALC:LIM:ESP:PCL:COUN 3
+//Define the value ranges of the three power classes as [dBm]:
+//power class 1: -200 to -100
+//power class 2: -100 to 0
+//power class 3: 0 to 200
+CALC:LIM:ESP:LIM -100,0
+//Define an absolute limit check for class 1.
+CALC:LIM:ESP:PCL1:LIM ABS
+//Define a relative limit check for class 2.
+CALC:LIM:ESP:PCL2:LIM REL
+//Define a manual selection of the power class.
+CALC:LIM:ESP:MODE MAN
+//Activate the use of the second power class for the entire measurement.
+CALC:LIM:ESP:PCL2 ON
+
+//------------ Configuring a Sweep List---------------------
+//Insert a range after range 2.
+ESP:RANG2:INS AFT
+//Insert a range before range 1.
+ESP:RANG1:INS BEF
+//Query the number of measurement ranges in the sweep list (currently 11).
+ESP:RANG:COUNt?
+//Delete the 11th range.
+ESP:RANG5:DEL
+
+//Define a stop frequency of -9 MHz for range 1.
+ESP:RANG1:STOP -10000000
+
+//Define a start frequency of -10 MHz for range 2.
+ESP:RANG2:STAR -9000000
+
+//Switch off Fast SEM mode so the ranges can be configured individually.
+ESP:HSP OFF
+
+//Define a resolution bandwidth of 1 MHz for range 2.
+ESP:RANG2:BAND:RES 1000000
+//Select an RRC filter for range 2.
+ESP:RANG2:FILT:TYPE RRC
+//Define a video bandwidth of 5 MHz for range 2.
+ESP:RANG2:BAND:VID 5000000
+//Define a sweep time of 1 second for range 2.
+ESP:RANG2:SWE:TIME 1
+//Define a reference level of 0 dBm for range 2.
+ESP:RANG2:RLEV 0
+//Define an input attenuation of 10 dB for range 2.
+ESP:RANG2:INP:ATT 10
+
+
+// Create a transducer that can be used.
+// It has to cover the corresponding frequency range
+
+SENSe1:CORRection:TRANsducer:SELect 'Transducer'
+SENSe1:CORRection:TRANsducer:UNIT 'DB'
+SENSe1:CORRection:TRANsducer:COMMent 'Test Transducer'
+// Frequency Span 0 MHz bis 20 Ghz
+SENSe1:CORRection:TRANsducer:DATA 0e6,5, 20e9,3
+
+
+//Include a transducer called 'transducer' for range 2.
+ESP:RANG2:TRAN 'Transducer'
+
+//------------ Configuring the limit check------------------
+
+//Check the absolute and relative limits for all ranges in power class 1 and
+//fails if both limits are violated. Since power class 2 is set to be used for
+//the entire measurement, values for Limit Check 1 are irrelevant. They are
+//defined here to demonstrate the use of the MAX function for relative limits.
+ESP:RANG:LIM1:STAT AND
+//Enable the use of maximum function for relative limit start. If the value
+//exceeds the larger of the absolute (-13 dBm) and relative (-10 dBc) start
+//values, the check fails.
+ESP:RANG2:LIM1:REL:STAR:FUNC MAX
+ESP:RANG2:LIM1:REL:STAR -10
+ESP:RANG2:LIM1:REL:STAR:ABS -13
+ESP:RANG2:LIM1:REL:STOP:FUNC MAX
+ESP:RANG2:LIM1:REL:STOP -10
+ESP:RANG2:LIM1:REL:STOP:ABS -13
+
+//Check the absolute and relative limits for all ranges in power class 2 and
+//fails if either limit is violated. Since power class 2 is set to be used for
+//the entire measurement, values for Limit Check 1 are irrelevant.
+ESP:RANG:LIM2:STAT OR
+//Define an absolute limit of 10 dBm for the entire range 2 for power class 2.
+ESP:RANG2:LIM2:ABS:STAR 10
+ESP:RANG2:LIM2:ABS:STOP 10
+//Define a relative limit of -20 dBc for the entire range 2 for power class 2.
+ESP:RANG2:LIM2:REL:STAR -20
+ESP:RANG2:LIM2:REL:STOP -20
+
+//------------ Configuring List Evaluation-----------------
+//Activate list evaluation, i.e. the peak is determined for each range
+//after each sweep.
+CALC:ESP:PSE:AUTO ON
+//Define a peak threshold of 10 dB.
+CALC:ESP:PSE:MARG 10dB
+
+//------------ Managing Measurement Configurations----------
+
+//Save the current configuration in a new file named '3GPP_UL_User'
+//in the same directory so the standard is not overwritten.
+ESP:PRES:STOR 'WCDMA\3GPP\UL\3GPP_UL_User.xml'
+
+//------------ Performing the measurement-------------------
+//One sweep
+INIT:ESP
+
+//------------ Checking the Results-------------------------
+//Query the result of the limit check for all ranges.
+CALC:LIM:FAIL?
+//Query the peak for each range of the SEM measurement as a list.
+TRAC:DATA? LIST

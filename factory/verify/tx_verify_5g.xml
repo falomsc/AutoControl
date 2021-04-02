@@ -1,0 +1,22 @@
+<setup>
+    <pipe pip="0">
+        <freq fre="3500">
+            <branch power="24">0</branch>
+            <branch power="24">1</branch>
+            <branch power="24">2</branch>
+            <branch power="24">3</branch>
+        </freq>
+        <freq fre="3575">
+            <branch power="24">0</branch>
+            <branch power="24">1</branch>
+            <branch power="24">2</branch>
+            <branch power="24">3</branch>
+        </freq>
+        <freq fre="3650">
+            <branch power="24">0</branch>
+            <branch power="24">1</branch>
+            <branch power="24">2</branch>
+            <branch power="24">3</branch>
+        </freq>
+    </pipe>
+</setup>

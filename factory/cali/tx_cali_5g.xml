@@ -1,0 +1,34 @@
+<setup>
+    <pipe pip="0">
+        <freq fre="3460">
+            <branch gain_list="-6, -3">0</branch>
+            <branch gain_list="-6, -3">1</branch>
+            <branch gain_list="-6, -3">2</branch>
+            <branch gain_list="-6, -3">3</branch>
+        </freq>
+        <freq fre="3517.5">
+            <branch gain_list="-6, -3">0</branch>
+            <branch gain_list="-6, -3">1</branch>
+            <branch gain_list="-6, -3">2</branch>
+            <branch gain_list="-6, -3">3</branch>
+        </freq>
+        <freq fre="3575">
+            <branch gain_list="-6, -3">0</branch>
+            <branch gain_list="-6, -3">1</branch>
+            <branch gain_list="-6, -3">2</branch>
+            <branch gain_list="-6, -3">3</branch>
+        </freq>
+        <freq fre="3632.5">
+            <branch gain_list="-6, -3">0</branch>
+            <branch gain_list="-6, -3">1</branch>
+            <branch gain_list="-6, -3">2</branch>
+            <branch gain_list="-6, -3">3</branch>
+        </freq>
+        <freq fre="3690">
+            <branch gain_list="-6, -3">0</branch>
+            <branch gain_list="-6, -3">1</branch>
+            <branch gain_list="-6, -3">2</branch>
+            <branch gain_list="-6, -3">3</branch>
+        </freq>
+    </pipe>
+</setup>

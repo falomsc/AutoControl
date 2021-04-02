@@ -1,0 +1,26 @@
+<setup>
+    <pipe pip="1">
+        <branch id="4">
+            <freq gainlist="-6, -3">2630</freq>
+            <freq gainlist="-6, -3">2655</freq>
+            <freq gainlist="-6, -3">2680</freq>
+        </branch>
+        <branch id="5">
+            <freq gainlist="-6, -3">2630</freq>
+            <freq gainlist="-6, -3">2655</freq>
+            <freq gainlist="-6, -3">2680</freq>
+        </branch>
+    </pipe>
+    <pipe pip="2">
+        <branch id="6">
+            <freq gainlist="-6, -3">2120</freq>
+            <freq gainlist="-6, -3">2155</freq>
+            <freq gainlist="-6, -3">2190</freq>
+        </branch>
+        <branch id="7">
+            <freq gainlist="-6, -3">2120</freq>
+            <freq gainlist="-6, -3">2155</freq>
+            <freq gainlist="-6, -3">2190</freq>
+        </branch>
+    </pipe>
+</setup>
