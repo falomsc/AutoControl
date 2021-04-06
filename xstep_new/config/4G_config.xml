@@ -1,0 +1,62 @@
+<setup>
+    <bandwidth bw="20">
+        <pipe pip="1">
+            <branch id="4">
+                <loss>28.9</loss>
+                <freq power="23">2630</freq>
+                <freq power="23">2655</freq>
+                <freq power="23">2680</freq>
+            </branch>
+            <branch id="5">
+                <loss>28.9</loss>
+                <freq power="23">2630</freq>
+                <freq power="23">2655</freq>
+                <freq power="23">2680</freq>
+            </branch>
+        </pipe>
+        <pipe pip="2">
+            <branch id="6">
+                <loss>28.6</loss>
+                <freq power="23">2120</freq>
+                <freq power="23">2155</freq>
+                <freq power="23">2190</freq>
+            </branch>
+            <branch id="7">
+                <loss>28.6</loss>
+                <freq power="23">2120</freq>
+                <freq power="23">2155</freq>
+                <freq power="23">2190</freq>
+            </branch>
+        </pipe>
+    </bandwidth>
+    <bandwidth bw="20+20">
+        <pipe pip="1">
+            <branch id="4">
+                <loss>28.9</loss>
+                <freq power="23">2640</freq>
+                <freq power="23">2655</freq>
+                <freq power="23">2670</freq>
+            </branch>
+            <branch id="5">
+                <loss>28.9</loss>
+                <freq power="23">2640</freq>
+                <freq power="23">2655</freq>
+                <freq power="23">2670</freq>
+            </branch>
+        </pipe>
+        <pipe pip="2">
+            <branch id="6">
+                <loss>28.6</loss>
+                <freq power="23">2130</freq>
+                <freq power="23">2155</freq>
+                <freq power="23">2180</freq>
+            </branch>
+            <branch id="7">
+                <loss>28.6</loss>
+                <freq power="23">2130</freq>
+                <freq power="23">2155</freq>
+                <freq power="23">2180</freq>
+            </branch>
+        </pipe>
+    </bandwidth>
+</setup>

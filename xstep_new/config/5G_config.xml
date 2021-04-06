@@ -1,0 +1,114 @@
+<setup>
+    <bandwidth bw="100">
+        <pipe pip="0">
+            <branch id="0">
+                <loss>29.6</loss>
+                <freq power="24">3500</freq>
+                <freq power="24">3575</freq>
+                <freq power="24">3650</freq>
+            </branch>
+            <branch id="1">
+                <loss>29.6</loss>
+                <freq power="24">3500</freq>
+                <freq power="24">3575</freq>
+                <freq power="24">3650</freq>
+            </branch>
+            <branch id="2">
+                <loss>29.6</loss>
+                <freq power="24">3500</freq>
+                <freq power="24">3575</freq>
+                <freq power="24">3650</freq>
+            </branch>
+            <branch id="3">
+                <loss>29.6</loss>
+                <freq power="24">3500</freq>
+                <freq power="24">3575</freq>
+                <freq power="24">3650</freq>
+            </branch>
+        </pipe>
+    </bandwidth>
+    <bandwidth bw="20">
+        <pipe pip="0">
+            <branch id="0">
+                <loss>29.6</loss>
+                <freq power="24">3460</freq>
+                <freq power="24">3575</freq>
+                <freq power="24">3690</freq>
+            </branch>
+            <branch id="1">
+                <loss>29.6</loss>
+                <freq power="24">3460</freq>
+                <freq power="24">3575</freq>
+                <freq power="24">3690</freq>
+            </branch>
+            <branch id="2">
+                <loss>29.6</loss>
+                <freq power="24">3460</freq>
+                <freq power="24">3575</freq>
+                <freq power="24">3690</freq>
+            </branch>
+            <branch id="3">
+                <loss>29.6</loss>
+                <freq power="24">3460</freq>
+                <freq power="24">3575</freq>
+                <freq power="24">3690</freq>
+            </branch>
+        </pipe>
+    </bandwidth>
+    <bandwidth bw="100+100">
+        <pipe pip="0">
+            <branch id="0">
+                <loss>29.6</loss>
+                <freq power="24">3550</freq>
+                <freq power="24">3575</freq>
+                <freq power="24">3600</freq>
+            </branch>
+            <branch id="1">
+                <loss>29.6</loss>
+                <freq power="24">3550</freq>
+                <freq power="24">3575</freq>
+                <freq power="24">3600</freq>
+            </branch>
+            <branch id="2">
+                <loss>29.6</loss>
+                <freq power="24">3550</freq>
+                <freq power="24">3575</freq>
+                <freq power="24">3600</freq>
+            </branch>
+            <branch id="3">
+                <loss>29.6</loss>
+                <freq power="24">3550</freq>
+                <freq power="24">3575</freq>
+                <freq power="24">3600</freq>
+            </branch>
+        </pipe>
+    </bandwidth>
+    <bandwidth bw="50+gap90+60">
+        <pipe pip="0">
+            <branch id="0">
+                <loss>29.6</loss>
+                <freq power="24">3550</freq>
+                <freq power="24">3575</freq>
+                <freq power="24">3600</freq>
+            </branch>
+            <branch id="1">
+                <loss>29.6</loss>
+                <freq power="24">3550</freq>
+                <freq power="24">3575</freq>
+                <freq power="24">3600</freq>
+            </branch>
+            <branch id="2">
+                <loss>29.6</loss>
+                <freq power="24">3550</freq>
+                <freq power="24">3575</freq>
+                <freq power="24">3600</freq>
+            </branch>
+            <branch id="3">
+                <loss>29.6</loss>
+                <freq power="24">3550</freq>
+                <freq power="24">3575</freq>
+                <freq power="24">3600</freq>
+            </branch>
+        </pipe>
+    </bandwidth>
+</setup>

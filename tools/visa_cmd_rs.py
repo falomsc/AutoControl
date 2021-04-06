@@ -235,10 +235,10 @@ def lte_aclr(v: VisaConnection, rf_params: Dict[str, str],
     :param delay:
     :return:
             Power
-            [TX Total(dBm), Adj Lower(dBc),
-                0               1
+            [TX Total(dBm),
+                0
             ACLR Power
-            Adj Upper(dBc), Alt1 Lower(dBc), Alt1 Upper(dBc), Alt1 Lower(dBc)]
+            Adj Lower(dBc), Adj Upper(dBc), Alt1 Lower(dBc), Alt1 Upper(dBc)]
                 2               3               4               5
     """
     freq = rf_params.get('freq')
@@ -397,7 +397,7 @@ def lte_evm(v: VisaConnection, rf_params: Dict[str, str],
             RSTP(dBm), OSTP(dBm), RSSI(dBm),
                 12      13          14
             Power(dBm), Crest Factor(dB)]
-                15      16
+                15          16
     """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -517,7 +517,7 @@ def lte_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
             RSTP(dBm), OSTP(dBm), RSSI(dBm),
                 12      13          14
             Power(dBm), Crest Factor(dB)]
-                15      16
+                15          16
     """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -782,6 +782,13 @@ def lte_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
         v.send_cmd("SENS:ESP%d:RANG6:LIM1:ABS:STAR -30" % (i+1))
         v.send_cmd("SENS:ESP%d:RANG6:LIM1:ABS:STOP -37" % (i+1))
 
+    if gap == "0":
+        num = 4
+    else:
+        num = 8
+        v.send_cmd("SENS:ESP1:RANG5:FREQ:STOP %d" % ((float(bw2)/2 + float(gap)/2) * 1e6))
+        v.send_cmd("SENS:ESP2:RANG1:FREQ:STAR -%d" % ((float(bw1)/2 + float(gap)/2) * 1e6))
+
     # v.send_cmd("INIT:CONT OFF")
     v.send_cmd("INIT;*WAI")
     time.sleep(delay)
@@ -796,10 +803,6 @@ def lte_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
     res1 = v.rec_cmd("CALC:MARK:FUNC:POW1:RES? CPOW")
     res2 = v.rec_cmd("CALC:MARK:FUNC:POW2:RES? CPOW")
     res3 = v.rec_cmd("TRAC:DATA? LIST").split(",")
-    if gap == "0":
-        num = 4
-    else:
-        num = 8
     for i in range(num):
         res3[1 + 11 * i: 5 + 11 * i] = hzlist_to_mhzlist(res3[1 + 11 * i: 5 + 11 * i])
     res3.insert(0, res2)
@@ -826,7 +829,13 @@ def nr5g_aclr(v: VisaConnection, rf_params: Dict[str, str],
     :param snap:
     :param snappath:
     :param delay:
-    :return: [TX Total(dBm), Adj Lower(dBc), Adj Upper(dBc), Alt1 Lower(dBc), Alt1 Upper(dBc)]
+    :return:
+            Power
+            [TX Total(dBm),
+                0
+            ACLR Power
+            Adj Lower(dBc), Adj Upper(dBc), Alt1 Lower(dBc), Alt1 Upper(dBc)]
+                1               2               3               4
     """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -885,8 +894,20 @@ def nr5g_multi_aclr(v: VisaConnection, rf_params: Dict[str, str],
     :param snap:
     :param snappath:
     :param delay:
-    :return: [CHP1(dBm), Sub Block A Total(dBm), CHP2(dBm), Sub Block B Total(dBm),
-            Adj Lower(dBc), Adj Upper(dBc), Alt1 Lower(dBc), Alt1 Upper(dBc)
+    :return:
+            Power
+            [CHP1(dBm), CHP2(dBm), Sub Block A Total(dBm), Sub Block B Total(dBm),
+                0           1           2                       3
+            ACLR Power
+            Adj Lower(dBc), Adj Upper(dBc), Alt1 Lower(dBc), Alt1 Upper(dBc),
+                4               5               6               7
+            ACLR Power
+            AB:Gap1L(dBc), AB:Gap1U(dBc), AB:Gap2L(dBc), AB:Gap2U(dBc),
+                8               9               10          11
+            CACLR Power
+            AB:Gap1L(dBc), AB:Gap1U(dBc), AB:Gap2L(dBc), AB:Gap2U(dBc)]
+                12              13              14          15
+
     """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -941,6 +962,9 @@ def nr5g_multi_aclr(v: VisaConnection, rf_params: Dict[str, str],
         v.send_cmd("HCOP:IMM1")
 
     res = v.rec_cmd("CALC:MARK:FUNC:POW:RES? MCAC").split(",")
+    if gap != "0":
+        res_gap_aclr = v.rec_cmd("CALC:MARK:FUNC:POW:RES? GACL").split(",")
+        res[-4:-4] = res_gap_aclr
     return strlist_to_floatlist(res)
 
 
@@ -971,7 +995,7 @@ def nr5g_evm(v: VisaConnection, rf_params: Dict[str, str],
             OSTP(dBm),
                 12
             Power(dBm), Crest Factor(dB)]
-                13      14
+                13          14
     """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -1089,7 +1113,7 @@ def nr5g_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
             OSTP(dBm),
                 12
             Power(dBm), Crest Factor(dB)]
-                13      14
+                13          14
     """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -1357,6 +1381,13 @@ def nr5g_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
         v.send_cmd("SENS:ESP%d:RANG4:LIM1:ABS:STAR -30" % (i+1))
         v.send_cmd("SENS:ESP%d:RANG4:LIM1:ABS:STOP -37" % (i+1))
 
+    if gap == "0":
+        num = 4
+    else:
+        num = 8
+        v.send_cmd("SENS:ESP1:RANG5:FREQ:STOP %d" % ((float(bw2)/2 + float(gap)/2) * 1e6))
+        v.send_cmd("SENS:ESP2:RANG1:FREQ:STAR -%d" % ((float(bw1)/2 + float(gap)/2) * 1e6))
+
     # v.send_cmd("INIT:CONT OFF")
     v.send_cmd("INIT;*WAI")
     time.sleep(delay)
@@ -1371,7 +1402,7 @@ def nr5g_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
     res1 = v.rec_cmd("CALC:MARK:FUNC:POW1:RES? CPOW")
     res2 = v.rec_cmd("CALC:MARK:FUNC:POW2:RES? CPOW")
     res3 = v.rec_cmd("TRAC:DATA? LIST").split(",")
-    for i in range(4):
+    for i in range(num):
         res3[1 + 11 * i: 5 + 11 * i] = hzlist_to_mhzlist(res3[1 + 11 * i: 5 + 11 * i])
     res3.insert(0, res2)
     res3.insert(0, res1)
