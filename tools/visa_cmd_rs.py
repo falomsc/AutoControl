@@ -90,7 +90,8 @@ def ccdf(v: VisaConnection, rf_params: Dict[str, str], abw: float,
     :param snap:
     :param snappath:
     :param delay:
-    :return: [Mean, Peak, Crest, 10%, 1%, 0.1%, 0.01%]
+    :return:
+    [Mean, Peak, Crest, 10%, 1%, 0.1%, 0.01%]
     """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -146,7 +147,8 @@ def se(v: VisaConnection, rf_params: Dict[str, str],
     :param snap:
     :param snappath:
     :param delay:
-    :return: [Range No, Range Low(MHz), Range Up(MHz), RBW(MHz), Frequency(MHz), Power Abs(dBm), Delta Limit(dB)]
+    :return:
+    [Range No, Range Low(MHz), Range Up(MHz), RBW(MHz), Frequency(MHz), Power Abs(dBm), Delta Limit(dB)]
     4 Ranges Totally
     """
     pipe = rf_params.get('pipe')
@@ -217,7 +219,7 @@ def se(v: VisaConnection, rf_params: Dict[str, str],
     return res
 
 
-def lte_aclr(v: VisaConnection, rf_params: Dict[str, str],
+def lte_acp(v: VisaConnection, rf_params: Dict[str, str],
              rel: float = 25, atten: int = 5,
              current: str = None, rename: str = None,
              exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
@@ -234,12 +236,12 @@ def lte_aclr(v: VisaConnection, rf_params: Dict[str, str],
     :param snappath:
     :param delay:
     :return:
-            Power
-            [TX Total(dBm),
-                0
-            ACLR Power
-            Adj Lower(dBc), Adj Upper(dBc), Alt1 Lower(dBc), Alt1 Upper(dBc)]
-                2               3               4               5
+    Power
+    [TX Total(dBm),
+        0
+    ACLR Power
+    Adj Lower(dBc), Adj Upper(dBc), Alt1 Lower(dBc), Alt1 Upper(dBc)]
+        1               2               3               4
     """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -278,7 +280,7 @@ def lte_aclr(v: VisaConnection, rf_params: Dict[str, str],
     return strlist_to_floatlist(res)
 
 
-def lte_multi_aclr(v: VisaConnection, rf_params: Dict[str, str],
+def lte_multi_acp(v: VisaConnection, rf_params: Dict[str, str],
                    rel: float = 25, atten: int = 5,
                    current: str = None, rename: str = None,
                    exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
@@ -296,25 +298,26 @@ def lte_multi_aclr(v: VisaConnection, rf_params: Dict[str, str],
     :param delay:
     :return:
     nogap:
-            Power
-            [CHP1(dBm), CHP2(dBm), Sub Block A Total(dBm),
-                0           1           2
-            ACLR Power
-            Adj Lower(dBc), Adj Upper(dBc), Alt1 Lower(dBc), Alt1 Upper(dBc)]
-                3               4               5               6
+    Power
+    [CHP1(dBm), CHP2(dBm), Sub Block A Total(dBm),
+        0           1           2
+    ACLR Power
+    Adj Lower(dBc), Adj Upper(dBc), Alt1 Lower(dBc), Alt1 Upper(dBc)]
+        3               4               5               6
+
     gap1 and gap2:
-            Power
-            [CHP1(dBm), CHP2(dBm), Sub Block A Total(dBm), Sub Block B Total(dBm),
-                0           1           2                       3
-            ACLR Power
-            Adj Lower(dBc), Adj Upper(dBc), Alt1 Lower(dBc), Alt1 Upper(dBc),
-                4               5               6               7
-            CACLR Power
-            AB:Gap1L(dBc), AB:Gap1U(dBc), AB:Gap2L(dBc), AB:Gap2U(dBc),
-                8               9               10          11
-            CACLR Power
-            AB:Gap1L(dBc), AB:Gap1U(dBc), AB:Gap2L(dBc), AB:Gap2U(dBc)]
-                12               13             14          15
+    Power
+    [CHP1(dBm), CHP2(dBm), Sub Block A Total(dBm), Sub Block B Total(dBm),
+        0           1           2                       3
+    ACLR Power
+    Adj Lower(dBc), Adj Upper(dBc), Alt1 Lower(dBc), Alt1 Upper(dBc),
+        4               5               6               7
+    ACLR Power
+    AB:Gap1L(dBc), AB:Gap1U(dBc), AB:Gap2L(dBc), AB:Gap2U(dBc),
+        8               9               10          11
+    CACLR Power
+    AB:Gap1L(dBc), AB:Gap1U(dBc), AB:Gap2L(dBc), AB:Gap2U(dBc)]
+        12               13             14          15
     """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -386,18 +389,19 @@ def lte_evm(v: VisaConnection, rf_params: Dict[str, str],
     :param snap:
     :param snappath:
     :param delay:
-    :return: [EVM PDSCH QPSK(%), EVM PDSCH 16QAM(%), EVM PDSCH 64QAM(%), EVM PDSCH 256QAM(%),
-                0                   1                   2                   3
-            EVM ALL(%), EVM Phys Channel(%), EVM Phys Signal(%),
-                4           5                   6
-            Frequency Error(Hz), Sampling Error(ppm),
-                7                   8
-            I/Q Offset(dB), I/Q Gain Imbalance(dB), I/Q Quadrature Error(°),
-                9               10                      11
-            RSTP(dBm), OSTP(dBm), RSSI(dBm),
-                12      13          14
-            Power(dBm), Crest Factor(dB)]
-                15          16
+    :return:
+    [EVM PDSCH QPSK(%), EVM PDSCH 16QAM(%), EVM PDSCH 64QAM(%), EVM PDSCH 256QAM(%),
+        0                   1                   2                   3
+    EVM ALL(%), EVM Phys Channel(%), EVM Phys Signal(%),
+        4           5                   6
+    Frequency Error(Hz), Sampling Error(ppm),
+        7                   8
+    I/Q Offset(dB), I/Q Gain Imbalance(dB), I/Q Quadrature Error(°),
+        9               10                      11
+    RSTP(dBm), OSTP(dBm), RSSI(dBm),
+        12      13          14
+    Power(dBm), Crest Factor(dB)]
+        15          16
     """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -505,19 +509,20 @@ def lte_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
     :param snap:
     :param snappath:
     :param delay:
-    :return: [CC1_EVM, CC2_EVM]
-            [EVM PDSCH QPSK(%), EVM PDSCH 16QAM(%), EVM PDSCH 64QAM(%), EVM PDSCH 256QAM(%),
-                0                   1                   2                   3
-            EVM ALL(%), EVM Phys Channel(%), EVM Phys Signal(%),
-                4           5                   6
-            Frequency Error(Hz), Sampling Error(ppm),
-                7                   8
-            I/Q Offset(dB), I/Q Gain Imbalance(dB), I/Q Quadrature Error(¡ã),
-                9               10                      11
-            RSTP(dBm), OSTP(dBm), RSSI(dBm),
-                12      13          14
-            Power(dBm), Crest Factor(dB)]
-                15          16
+    :return:
+    [CC1_EVM, CC2_EVM]
+    [EVM PDSCH QPSK(%), EVM PDSCH 16QAM(%), EVM PDSCH 64QAM(%), EVM PDSCH 256QAM(%),
+        0                   1                   2                   3
+    EVM ALL(%), EVM Phys Channel(%), EVM Phys Signal(%),
+        4           5                   6
+    Frequency Error(Hz), Sampling Error(ppm),
+        7                   8
+    I/Q Offset(dB), I/Q Gain Imbalance(dB), I/Q Quadrature Error(¡ã),
+        9               10                      11
+    RSTP(dBm), OSTP(dBm), RSSI(dBm),
+        12      13          14
+    Power(dBm), Crest Factor(dB)]
+        15          16
     """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -643,7 +648,8 @@ def lte_sem(v: VisaConnection, rf_params: Dict[str, str],
     :param snap:
     :param snappath:
     :param delay:
-    :return: [TxPower(dBm), Range No, Start Freq Rel(MHz), Stop Freq Rel(MHz), RBW(MHz),
+    :return:
+    [TxPower(dBm), Range No, Start Freq Rel(MHz), Stop Freq Rel(MHz), RBW(MHz),
     Frequency at Delta to Limit(MHz), Power Abs(dBm), Power Rel(dB), Delta to Limit(dB), ...]
     4 Ranges Totally
     """
@@ -726,7 +732,8 @@ def lte_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
     :param snap:
     :param snappath:
     :param delay:
-    :return: [TxPower1(dBm), TxPower2(dBm), Range No, Start Freq Rel(MHz), Stop Freq Rel(MHz), RBW(MHz),
+    :return:
+    [TxPower1(dBm), TxPower2(dBm), Range No, Start Freq Rel(MHz), Stop Freq Rel(MHz), RBW(MHz),
     Frequency at Delta to Limit(MHz), Power Abs(dBm), Power Rel(dB), Delta to Limit(dB), ...]
     4 Ranges Totally
     """
@@ -813,7 +820,7 @@ def lte_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
     return res
 
 
-def nr5g_aclr(v: VisaConnection, rf_params: Dict[str, str],
+def nr5g_acp(v: VisaConnection, rf_params: Dict[str, str],
               rel: float = 25, atten: int = 5,
               current: str = None, rename: str = None,
               exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 20) -> List[float]:
@@ -830,12 +837,12 @@ def nr5g_aclr(v: VisaConnection, rf_params: Dict[str, str],
     :param snappath:
     :param delay:
     :return:
-            Power
-            [TX Total(dBm),
-                0
-            ACLR Power
-            Adj Lower(dBc), Adj Upper(dBc), Alt1 Lower(dBc), Alt1 Upper(dBc)]
-                1               2               3               4
+    Power
+    [TX Total(dBm),
+        0
+    ACLR Power
+    Adj Lower(dBc), Adj Upper(dBc), Alt1 Lower(dBc), Alt1 Upper(dBc)]
+        1               2               3               4
     """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -878,7 +885,7 @@ def nr5g_aclr(v: VisaConnection, rf_params: Dict[str, str],
     return strlist_to_floatlist(res)
 
 
-def nr5g_multi_aclr(v: VisaConnection, rf_params: Dict[str, str],
+def nr5g_multi_acp(v: VisaConnection, rf_params: Dict[str, str],
                     rel: float = 25, atten: int = 5,
                     current: str = None, rename: str = None,
                     exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 20) -> List[float]:
@@ -895,19 +902,27 @@ def nr5g_multi_aclr(v: VisaConnection, rf_params: Dict[str, str],
     :param snappath:
     :param delay:
     :return:
-            Power
-            [CHP1(dBm), CHP2(dBm), Sub Block A Total(dBm), Sub Block B Total(dBm),
-                0           1           2                       3
-            ACLR Power
-            Adj Lower(dBc), Adj Upper(dBc), Alt1 Lower(dBc), Alt1 Upper(dBc),
-                4               5               6               7
-            ACLR Power
-            AB:Gap1L(dBc), AB:Gap1U(dBc), AB:Gap2L(dBc), AB:Gap2U(dBc),
-                8               9               10          11
-            CACLR Power
-            AB:Gap1L(dBc), AB:Gap1U(dBc), AB:Gap2L(dBc), AB:Gap2U(dBc)]
-                12              13              14          15
+    nogap:
+    Power
+    [CHP1(dBm), CHP2(dBm), Sub Block A Total(dBm), Sub Block B Total(dBm),
+        0           1           2                       3
+    ACLR Power
+    Adj Lower(dBc), Adj Upper(dBc), Alt1 Lower(dBc), Alt1 Upper(dBc)]
+        4               5               6               7
 
+    gap1 and gap2:
+    Power
+    [CHP1(dBm), CHP2(dBm), Sub Block A Total(dBm), Sub Block B Total(dBm),
+        0           1           2                       3
+    ACLR Power
+    Adj Lower(dBc), Adj Upper(dBc), Alt1 Lower(dBc), Alt1 Upper(dBc),
+        4               5               6               7
+    ACLR Power
+    AB:Gap1L(dBc), AB:Gap1U(dBc), AB:Gap2L(dBc), AB:Gap2U(dBc),
+        8               9               10          11
+    CACLR Power
+    AB:Gap1L(dBc), AB:Gap1U(dBc), AB:Gap2L(dBc), AB:Gap2U(dBc)]
+        12              13              14          15
     """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -984,18 +999,19 @@ def nr5g_evm(v: VisaConnection, rf_params: Dict[str, str],
     :param snap:
     :param snappath:
     :param delay:
-    :return: [EVM PDSCH QPSK(%), EVM PDSCH 16QAM(%), EVM PDSCH 64QAM(%), EVM PDSCH 256QAM(%),
-                0                   1                   2                   3
-            EVM ALL(%), EVM Phys Channel(%), EVM Phys Signal(%),
-                4           5                   6
-            Frequency Error(Hz), Sampling Error(ppm),
-                7                   8
-            I/Q Offset(dB), I/Q Gain Imbalance(dB), I/Q Quadrature Error(°),
-                9               10                      11
-            OSTP(dBm),
-                12
-            Power(dBm), Crest Factor(dB)]
-                13          14
+    :return:
+    [EVM PDSCH QPSK(%), EVM PDSCH 16QAM(%), EVM PDSCH 64QAM(%), EVM PDSCH 256QAM(%),
+        0                   1                   2                   3
+    EVM ALL(%), EVM Phys Channel(%), EVM Phys Signal(%),
+        4           5                   6
+    Frequency Error(Hz), Sampling Error(ppm),
+        7                   8
+    I/Q Offset(dB), I/Q Gain Imbalance(dB), I/Q Quadrature Error(°),
+        9               10                      11
+    OSTP(dBm),
+        12
+    Power(dBm), Crest Factor(dB)]
+        13          14
     """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -1101,19 +1117,20 @@ def nr5g_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
     :param snap:
     :param snappath:
     :param delay:
-    :return: [CC1_EVM, CC2_EVM]
-            [EVM PDSCH QPSK(%), EVM PDSCH 16QAM(%), EVM PDSCH 64QAM(%), EVM PDSCH 256QAM(%),
-                0                   1                   2                   3
-            EVM ALL(%), EVM Phys Channel(%), EVM Phys Signal(%),
-                4           5                   6
-            Frequency Error(Hz), Sampling Error(ppm),
-                7                   8
-            I/Q Offset(dB), I/Q Gain Imbalance(dB), I/Q Quadrature Error(¡ã),
-                9               10                      11
-            OSTP(dBm),
-                12
-            Power(dBm), Crest Factor(dB)]
-                13          14
+    :return:
+    [CC1_EVM, CC2_EVM]
+    [EVM PDSCH QPSK(%), EVM PDSCH 16QAM(%), EVM PDSCH 64QAM(%), EVM PDSCH 256QAM(%),
+        0                   1                   2                   3
+    EVM ALL(%), EVM Phys Channel(%), EVM Phys Signal(%),
+        4           5                   6
+    Frequency Error(Hz), Sampling Error(ppm),
+        7                   8
+    I/Q Offset(dB), I/Q Gain Imbalance(dB), I/Q Quadrature Error(¡ã),
+        9               10                      11
+    OSTP(dBm),
+        12
+    Power(dBm), Crest Factor(dB)]
+        13          14
     """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -1242,7 +1259,8 @@ def nr5g_sem(v: VisaConnection, rf_params: Dict[str, str],
     :param snap:
     :param snappath:
     :param delay:
-    :return: [TxPower(dBm), Range No, Start Freq Rel(MHz), Stop Freq Rel(MHz), RBW(MHz),
+    :return:
+    [TxPower(dBm), Range No, Start Freq Rel(MHz), Stop Freq Rel(MHz), RBW(MHz),
     Frequency at Delta to Limit(MHz), Power Abs(dBm), Power Rel(dB), Delta to Limit(dB), ...]
     4 Ranges Totally
     """
@@ -1323,7 +1341,8 @@ def nr5g_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
     :param snap:
     :param snappath:
     :param delay:
-    :return: [TxPower1(dBm), TxPower2(dBm), Range No, Start Freq Rel(MHz), Stop Freq Rel(MHz), RBW(MHz),
+    :return:
+    [TxPower1(dBm), TxPower2(dBm), Range No, Start Freq Rel(MHz), Stop Freq Rel(MHz), RBW(MHz),
     Frequency at Delta to Limit(MHz), Power Abs(dBm), Power Rel(dB), Delta to Limit(dB), ...]
     4 Ranges Totally
     """
