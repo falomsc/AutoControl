@@ -37,7 +37,7 @@ class FillReport:
 
         if typ == FillReport.BASIC:
             for i, v in enumerate(self._second_row):
-                if v == "Temperature(℃)":
+                if v == "Test_Mode":
                     col_start = i + 1
                     break
             for r in self._ws.iter_rows(min_row=row, max_row=row, min_col=col_start, max_col=col_start + len(res) - 1):

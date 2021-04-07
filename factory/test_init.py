@@ -14,7 +14,7 @@ p = f1 = f2 = e = 0
 while True:
     if p+f1+f2 == 20:
         break
-    s = SSHConnection(host="192.168.255.129", port=22, username="toor4nsn", password="oZPS0POrRieRtu")
+    s = SSHConnection(hostname="192.168.255.129", port=22, username="toor4nsn", password="oZPS0POrRieRtu")
     for i in range(10):
         sync = s.rfsw_cmd("cpri init_ant 0 8")
         if re.search("CPRI synced", sync):

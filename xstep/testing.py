@@ -21,10 +21,10 @@ class Testing:
         s2: get attenuation
         :param pid:
         """
-        self.s1 = SSHConnection(host=cf.get("ssh", "hostname"), port=int(cf.get("ssh", "port")),
+        self.s1 = SSHConnection(hostname=cf.get("ssh", "hostname"), port=int(cf.get("ssh", "port")),
                                 username=cf.get("ssh", "username"), password=cf.get("ssh", "password"),
                                 print_flag=False)
-        self.s2 = SSHConnection(host=cf.get("ssh", "hostname"), port=int(cf.get("ssh", "port")),
+        self.s2 = SSHConnection(hostname=cf.get("ssh", "hostname"), port=int(cf.get("ssh", "port")),
                                 username=cf.get("ssh", "username"), password=cf.get("ssh", "password"),
                                 print_flag=False)
         self.v = VisaConnection(address=cf.get("visa", "address"), timeout=int(cf.get("visa", "timeout")))

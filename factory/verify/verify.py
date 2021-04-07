@@ -80,7 +80,7 @@ def rx_verify():
 
 
 if __name__ == '__main__':
-    s = SSHConnection(host="192.168.255.129", port=22, username="toor4nsn", password="oZPS0POrRieRtu")
+    s = SSHConnection(hostname="192.168.255.129", port=22, username="toor4nsn", password="oZPS0POrRieRtu")
     tx_pipe_list = get_verify_tx_config("./tx_verify_all.xml")
     check_connection(s)
     tx_verify(s, tx_pipe_list)

@@ -107,7 +107,7 @@ class Calibration:
 
 if __name__ == '__main__':
     for i in range(50):
-        s = SSHConnection(host="192.168.255.129", port=22, username="toor4nsn", password="oZPS0POrRieRtu")
+        s = SSHConnection(hostname="192.168.255.129", port=22, username="toor4nsn", password="oZPS0POrRieRtu")
         v = VisaConnection("TCPIP0::192.168.255.125::inst0::INSTR", timeout=10000)
         tx_pipe_list = get_cali_tx_config("./tx_cali_5g.xml")
         ca = Calibration(s, v)

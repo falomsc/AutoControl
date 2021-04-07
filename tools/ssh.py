@@ -12,12 +12,12 @@ class SSHConnection:
     RFSW = 2
     AASHELL = 3
 
-    def __init__(self, host: str, port: int, username: str, password: str,
+    def __init__(self, hostname: str, port: int, username: str, password: str,
                  print_flag: bool = True, log_flag: bool = False, sg: pyqtSignal = None,
                  delay: float = 0.5):
         """
 
-        :param host:
+        :param hostname:
         :param port:
         :param username:
         :param password:
@@ -33,7 +33,7 @@ class SSHConnection:
         self.sg = sg
         self._delay = delay
 
-        self._transport = paramiko.Transport((host, port))
+        self._transport = paramiko.Transport((hostname, port))
         self._transport.connect(username=username, password=password)
         self._ssh = paramiko.SSHClient()
         self._ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
