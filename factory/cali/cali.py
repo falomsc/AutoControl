@@ -93,7 +93,7 @@ class Calibration:
                             self._s.pprint("\n************* ")
                             self._s.pprint("LOW POWER!")
                             self._s.pprint(" *************\n")
-                            self._s.rfsw_cmd("madura ArmMemDump 0.{pipe} /tmp/armdump.bin".format(pipe=pipe))
+                            # self._s.rfsw_cmd("madura ArmMemDump 0.{pipe} /tmp/armdump.bin".format(pipe=pipe))
                             while True:
                                 self._s.pprint("\n")
                                 cmd = input("Please enter command:")
@@ -106,10 +106,11 @@ class Calibration:
 
 
 if __name__ == '__main__':
-    for _ in range(50):
+    for i in range(50):
         s = SSHConnection(host="192.168.255.129", port=22, username="toor4nsn", password="oZPS0POrRieRtu")
         v = VisaConnection("TCPIP0::192.168.255.125::inst0::INSTR", timeout=10000)
         tx_pipe_list = get_cali_tx_config("./tx_cali_5g.xml")
         ca = Calibration(s, v)
         ca.check_connection()
         ca.tx_cali(tx_pipe_list)
+        print("******** 第 %d 校准完毕 ********" % (i+1))
