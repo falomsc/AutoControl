@@ -100,7 +100,7 @@ class FillReport:
                 if v == "CCDF(dB)":
                     col_start = i + 1
                     break
-            self._ws.cell(row=self._row, column=col_start).value = res
+            self._ws.cell(row=self._row, column=col_start).value = res[6]
 
         elif typ // 10 == 6:
             for i, v in enumerate(self._second_row):
@@ -113,8 +113,8 @@ class FillReport:
                         r[0].value = res[2][0]
                     elif mode_extra in ("TM3_1A", "TM2A"):
                         r[0].value = res[3][0]
-                    r[2] = res[7][0]
-                    r[4] = res[13][0]
+                    r[2].value = res[7][0]
+                    r[4].value = res[13][0]
             elif typ == FillReport.LTE_MULTI_ACP:
                 for r in self._ws.iter_rows(min_row=self._row, max_row=self._row, min_col=col_start, max_col=col_start + 11):
                     if mode_extra in ("TM3_1", "TM2"):
@@ -123,18 +123,18 @@ class FillReport:
                     elif mode_extra in ("TM3_1A", "TM2A"):
                         r[0].value = res[0][3][0]
                         r[1].value = res[1][3][0]
-                    r[2] = res[0][7][0]
-                    r[3] = res[1][7][0]
-                    r[4] = res[0][13][0]
-                    r[5] = res[0][13][0]
+                    r[2].value = res[0][7][0]
+                    r[3].value = res[1][7][0]
+                    r[4].value = res[0][13][0]
+                    r[5].value = res[0][13][0]
             elif typ == FillReport.NR5G_EVM:
                 for r in self._ws.iter_rows(min_row=self._row, max_row=self._row, min_col=col_start, max_col=col_start + 11):
                     if mode_extra in ("TM3_1", "TM2"):
                         r[0].value = res[2][0]
                     elif mode_extra in ("TM3_1A", "TM2A"):
                         r[0].value = res[3][0]
-                    r[2] = res[7][0]
-                    r[4] = res[12][0]
+                    r[2].value = res[7][0]
+                    r[4].value = res[12][0]
             elif typ == FillReport.NR5G_MULTI_EVM:
                 for r in self._ws.iter_rows(min_row=self._row, max_row=self._row, min_col=col_start, max_col=col_start + 11):
                     if mode_extra in ("TM3_1", "TM2"):
@@ -143,10 +143,10 @@ class FillReport:
                     elif mode_extra in ("TM3_1A", "TM2A"):
                         r[0].value = res[0][3][0]
                         r[1].value = res[1][3][0]
-                    r[2] = res[0][7][0]
-                    r[3] = res[1][7][0]
-                    r[4] = res[0][12][0]
-                    r[5] = res[0][12][0]
+                    r[2].value = res[0][7][0]
+                    r[3].value = res[1][7][0]
+                    r[4].value = res[0][12][0]
+                    r[5].value = res[0][12][0]
 
         elif typ // 10 == 7:
             if typ in (FillReport.LTE_SEM, FillReport.NR5G_SEM):

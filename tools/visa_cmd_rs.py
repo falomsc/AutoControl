@@ -7,7 +7,7 @@ from tools.visa import VisaConnection
 
 
 def obw(v: VisaConnection, rf_params: Dict[str, str], span: int,
-        rel: float = 25, atten: int = 20, rbw: int = 30, count: int = 10001, point: int = 10001,
+        rel: float = 25, atten: int = 20, rbw: int = 30, count: int = 0, point: int = 10001,
         current: str = None, rename: str = None,
         exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> float:
     """
@@ -74,7 +74,8 @@ def obw(v: VisaConnection, rf_params: Dict[str, str], span: int,
 
 
 def multi_obw(v: VisaConnection, rf_params: Dict[str, str], span1: int, span2: int,
-              rel: float = 25, atten: int = 20, rbw: int = 30, count: int = 10001, point: int = 10001,
+              rel: float = 25, atten: int = 20, rbw: int = 30,
+              count1: int = 0, count2: int = 0, point1: int = 10001, point2: int = 10001,
               current1: str = None, current2: str = None, rename1: str = None, rename2: str = None,
               exs: bool = False, snap: bool = False, snappath1: str = None, snappath2: str = None,
               delay: int = 5) -> List[float]:
@@ -94,8 +95,8 @@ def multi_obw(v: VisaConnection, rf_params: Dict[str, str], span1: int, span2: i
     rf_params2['bandwidth'] = bw1
     rf_params1['freq'] = freq1
     rf_params2['freq'] = freq2
-    res = [obw(v, rf_params1, span1, rel, atten, rbw, count, point, current1, rename1, exs, snap, snappath1, delay),
-           obw(v, rf_params2, span2, rel, atten, rbw, count, point, current2, rename2, exs, snap, snappath2, delay)]
+    res = [obw(v, rf_params1, span1, rel, atten, rbw, count1, point1, current1, rename1, exs, snap, snappath1, delay),
+           obw(v, rf_params2, span2, rel, atten, rbw, count2, point2, current2, rename2, exs, snap, snappath2, delay)]
     return res
 
 
@@ -118,6 +119,7 @@ def ccdf(v: VisaConnection, rf_params: Dict[str, str], abw: int,
     :param delay:
     :return:
     [Mean, Peak, Crest, 10%, 1%, 0.1%, 0.01%]
+        0   1       2   3   4       5   6
     """
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
@@ -156,7 +158,7 @@ def ccdf(v: VisaConnection, rf_params: Dict[str, str], abw: int,
     res.append(v.rec_cmd("CALC:STAT:CCDF:X1? P0_01"))
     return strlist_to_floatlist(res)
 
-
+# TODO condition: exs=True
 def se(v: VisaConnection, rf_params: Dict[str, str],
        rel: float = 25, atten: int = 10,
        current: str = None, rename: str = None,
