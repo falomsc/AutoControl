@@ -73,7 +73,28 @@ def obw(v: VisaConnection, rf_params: Dict[str, str], span: int,
     return hz_to_mhz(res)
 
 
-def ccdf(v: VisaConnection, rf_params: Dict[str, str], abw: float,
+def multi_obw(v: VisaConnection, rf_params: Dict[str, str], span: int,
+              rel: float = 25, atten: int = 20, rbw: int = 30, count: int = 10001, point: int = 10001,
+              current: str = None, rename: str = None,
+              exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
+    bandwidth = rf_params.get('bandwidth')
+    freq = rf_params.get('freq')
+    bw1 = re.match("(.\d+)", bandwidth).group(1)
+    if bandwidth.find("gap") > -1:
+        gap = re.search("gap(.\d+)", bandwidth).group(1)
+        bw2 = re.search("\+(.\d+)", bandwidth).group(1)
+    else:
+        gap = "0"
+        bw2 = re.search("\+(.\d+)", bandwidth).group(1)
+    rf_params1 = rf_params2 = rf_params
+    rf_params1['bandwidth'] = bw1
+    rf_params2['bandwidth'] = bw1
+    freq1 = str((float(freq) - float(bw2) / 2 - float(gap) / 2))
+    freq2 = str((float(freq) + float(bw1) / 2 + float(gap) / 2))
+    res = obw
+
+
+def ccdf(v: VisaConnection, rf_params: Dict[str, str], abw: int,
          rel: float = 25, atten: int = 20,
          current: str = None, rename: str = None,
          exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
@@ -110,7 +131,7 @@ def ccdf(v: VisaConnection, rf_params: Dict[str, str], abw: float,
     v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
     v.send_cmd("INP:ATT %ddB" % atten)
 
-    v.send_cmd("BAND %f MHz" % abw)
+    v.send_cmd("BAND %d MHz" % abw)
 
     # v.send_cmd("INIT:CONT OFF")
     # v.send_cmd("INIT;*WAI")
