@@ -54,8 +54,8 @@ config_list = Testing.getConfig("./config/5G_config.xml")
 wb = load_workbook("./report/common.xlsx")
 ws_sem = wb["SEM"]
 ws_se = wb["SE"]
-row_sem = newline(ws_sem, init_row=2, space=4)
-row_se = newline(ws_se, init_row=2, space=5)
+row_sem = new_line(ws_sem, init_row=2, space=4)
+row_se = new_line(ws_se, init_row=2, space=5)
 for config in config_list:
     config['temp'] = '25'
     config['mode'] = '31'
@@ -76,7 +76,7 @@ for config in config_list:
         for cell in r:
             cell.value = res2[i]
             i += 1
-    row_sem = newline(ws_sem, init_row=row_sem, space=4)
+    row_sem = new_line(ws_sem, init_row=row_sem, space=4)
 
 
     v.send_cmd("INST:CRE:NEW SANALYZER, 'Spectrum'")
@@ -90,6 +90,6 @@ for config in config_list:
         for cell in r:
             cell.value = res3[j]
             j += 1
-    row_se = newline(ws_se, init_row=row_se, space=5)
+    row_se = new_line(ws_se, init_row=row_se, space=5)
 
     wb.save("./report/common.xlsx")

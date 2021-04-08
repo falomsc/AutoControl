@@ -1,4 +1,8 @@
+from typing import Union
+
 from openpyxl import load_workbook
+
+from tools.function import new_line
 
 
 class FillReport:
@@ -31,8 +35,12 @@ class FillReport:
         self._ws = self._wb["RAW_DATA"]
         self._first_row = tuple(self._ws.values)[0]
         self._second_row = tuple(self._ws.values)[1]
+        self._row = 3
 
-    def fill_xl_value(self, typ: int, row: int, res: list, mode_extra: str = "TM3_1"):
+    def next_line(self):
+        self._row = new_line(self._ws, init_row=self._row, col=3)
+
+    def fill_xl_value(self, typ: int, res: Union[list, float], mode_extra: str = "TM3_1"):
         col_start = 1
 
         if typ == FillReport.BASIC:
@@ -40,7 +48,7 @@ class FillReport:
                 if v == "Test_Mode":
                     col_start = i + 1
                     break
-            for r in self._ws.iter_rows(min_row=row, max_row=row, min_col=col_start, max_col=col_start + len(res) - 1):
+            for r in self._ws.iter_rows(min_row=self._row, max_row=self._row, min_col=col_start, max_col=col_start + len(res) - 1):
                 for j, cell in enumerate(r):
                     cell.value = res[j]
 
@@ -49,7 +57,7 @@ class FillReport:
                 if v == "Madura_Atten(dB)":
                     col_start = i + 1
                     break
-            for r in self._ws.iter_rows(min_row=row, max_row=row, min_col=col_start, max_col=col_start + len(res) - 1):
+            for r in self._ws.iter_rows(min_row=self._row, max_row=self._row, min_col=col_start, max_col=col_start + len(res) - 1):
                 for j, cell in enumerate(r):
                     cell.value = res[j]
 
@@ -59,20 +67,20 @@ class FillReport:
                     col_start = i + 1
                     break
             if typ in (FillReport.LTE_ACP, FillReport.NR5G_ACP):
-                for r in self._ws.iter_rows(min_row=row, max_row=row, min_col=col_start + 3, max_col=col_start + 7):
+                for r in self._ws.iter_rows(min_row=self._row, max_row=self._row, min_col=col_start + 3, max_col=col_start + 7):
                     for j, cell in enumerate(r):
                         cell.value = res[j]
             if typ == FillReport.LTE_MULTI_ACP:
-                for r in self._ws.iter_rows(min_row=row, max_row=row, min_col=col_start, max_col=col_start + 7):
+                for r in self._ws.iter_rows(min_row=self._row, max_row=self._row, min_col=col_start, max_col=col_start + 7):
                     res.insert(3, "")
                     for j, cell in enumerate(r):
                         cell.value = res[j]
             if typ == FillReport.NR5G_MULTI_ACP:
-                for r in self._ws.iter_rows(min_row=row, max_row=row, min_col=col_start, max_col=col_start + 7):
+                for r in self._ws.iter_rows(min_row=self._row, max_row=self._row, min_col=col_start, max_col=col_start + 7):
                     for j, cell in enumerate(r):
                         cell.value = res[j]
             if typ in (FillReport.LTE_MULTI_GAP_ACP, FillReport.NR5G_MULTI_GAP_ACP):
-                for r in self._ws.iter_rows(min_row=row, max_row=row, min_col=col_start, max_col=col_start + 11):
+                for r in self._ws.iter_rows(min_row=self._row, max_row=self._row, min_col=col_start, max_col=col_start + 11):
                     for j, cell in enumerate(r):
                         cell.value = res[j]
 
@@ -82,17 +90,17 @@ class FillReport:
                     col_start = i + 1
                     break
             if typ == FillReport.OBW:
-                self._ws.cell(row=row, column=col_start).value = res
+                self._ws.cell(row=self._row, column=col_start).value = res
             if typ == FillReport.MULTI_OBW:
-                self._ws.cell(row=row, column=col_start).value = res[0]
-                self._ws.cell(row=row, column=col_start + 1).value = res[1]
+                self._ws.cell(row=self._row, column=col_start).value = res[0]
+                self._ws.cell(row=self._row, column=col_start + 1).value = res[1]
 
         elif typ == FillReport.CCDF:
             for i, v in enumerate(self._second_row):
                 if v == "CCDF(dB)":
                     col_start = i + 1
                     break
-            self._ws.cell(row=row, column=col_start).value = res
+            self._ws.cell(row=self._row, column=col_start).value = res
 
         elif typ // 10 == 6:
             for i, v in enumerate(self._second_row):
@@ -100,7 +108,7 @@ class FillReport:
                     col_start = i + 1
                     break
             if typ == FillReport.LTE_EVM:
-                for r in self._ws.iter_rows(min_row=row, max_row=row, min_col=col_start, max_col=col_start + 11):
+                for r in self._ws.iter_rows(min_row=self._row, max_row=self._row, min_col=col_start, max_col=col_start + 11):
                     if mode_extra in ("TM3_1", "TM2"):
                         r[0].value = res[2][0]
                     elif mode_extra in ("TM3_1A", "TM2A"):
@@ -108,7 +116,7 @@ class FillReport:
                     r[2] = res[7][0]
                     r[4] = res[13][0]
             elif typ == FillReport.LTE_MULTI_ACP:
-                for r in self._ws.iter_rows(min_row=row, max_row=row, min_col=col_start, max_col=col_start + 11):
+                for r in self._ws.iter_rows(min_row=self._row, max_row=self._row, min_col=col_start, max_col=col_start + 11):
                     if mode_extra in ("TM3_1", "TM2"):
                         r[0].value = res[0][2][0]
                         r[1].value = res[1][2][0]
@@ -120,7 +128,7 @@ class FillReport:
                     r[4] = res[0][13][0]
                     r[5] = res[0][13][0]
             elif typ == FillReport.NR5G_EVM:
-                for r in self._ws.iter_rows(min_row=row, max_row=row, min_col=col_start, max_col=col_start + 11):
+                for r in self._ws.iter_rows(min_row=self._row, max_row=self._row, min_col=col_start, max_col=col_start + 11):
                     if mode_extra in ("TM3_1", "TM2"):
                         r[0].value = res[2][0]
                     elif mode_extra in ("TM3_1A", "TM2A"):
@@ -128,7 +136,7 @@ class FillReport:
                     r[2] = res[7][0]
                     r[4] = res[12][0]
             elif typ == FillReport.NR5G_MULTI_EVM:
-                for r in self._ws.iter_rows(min_row=row, max_row=row, min_col=col_start, max_col=col_start + 11):
+                for r in self._ws.iter_rows(min_row=self._row, max_row=self._row, min_col=col_start, max_col=col_start + 11):
                     if mode_extra in ("TM3_1", "TM2"):
                         r[0].value = res[0][2][0]
                         r[1].value = res[1][2][0]
@@ -149,7 +157,7 @@ class FillReport:
                 if v == "Range No.1" and self._ws.cell(row=1, column=i + 1).value == "SEM":
                     col_start = i + 1
                     break
-            for r in self._ws.iter_rows(min_row=row, max_row=row, min_col=col_start,
+            for r in self._ws.iter_rows(min_row=self._row, max_row=self._row, min_col=col_start,
                                         max_col=col_start + len(res) - n - 1):
                 for j, cell in enumerate(r):
                     cell.value = res[j + n]
@@ -159,7 +167,7 @@ class FillReport:
                 if v == "Range No.1" and self._ws.cell(row=1, column=i + 1).value == "SE":
                     col_start = i + 1
                     break
-            for r in self._ws.iter_rows(min_row=row, max_row=row, min_col=col_start, max_col=col_start + len(res) - 1):
+            for r in self._ws.iter_rows(min_row=self._row, max_row=self._row, min_col=col_start, max_col=col_start + len(res) - 1):
                 for j, cell in enumerate(r):
                     cell.value = res[j]
 
@@ -168,4 +176,4 @@ class FillReport:
 
 if __name__ == '__main__':
     fil = FillReport("./report/model.xlsx")
-    fil.fill_xl_value(FillReport.LTE_MULTI_ACP, 5, [20, 20, 23, -45, -46, -47, -48])
+    # fil.fill_xl_value(FillReport.LTE_MULTI_ACP, 5, [20, 20, 23, -45, -46, -47, -48])

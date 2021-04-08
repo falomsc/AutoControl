@@ -73,10 +73,11 @@ def obw(v: VisaConnection, rf_params: Dict[str, str], span: int,
     return hz_to_mhz(res)
 
 
-def multi_obw(v: VisaConnection, rf_params: Dict[str, str], span: int,
+def multi_obw(v: VisaConnection, rf_params: Dict[str, str], span1: int, span2: int,
               rel: float = 25, atten: int = 20, rbw: int = 30, count: int = 10001, point: int = 10001,
-              current: str = None, rename: str = None,
-              exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
+              current1: str = None, current2: str = None, rename1: str = None, rename2: str = None,
+              exs: bool = False, snap: bool = False, snappath1: str = None, snappath2: str = None,
+              delay: int = 5) -> List[float]:
     bandwidth = rf_params.get('bandwidth')
     freq = rf_params.get('freq')
     bw1 = re.match("(.\d+)", bandwidth).group(1)
@@ -86,12 +87,16 @@ def multi_obw(v: VisaConnection, rf_params: Dict[str, str], span: int,
     else:
         gap = "0"
         bw2 = re.search("\+(.\d+)", bandwidth).group(1)
+    freq1 = str((float(freq) - float(bw2) / 2 - float(gap) / 2))
+    freq2 = str((float(freq) + float(bw1) / 2 + float(gap) / 2))
     rf_params1 = rf_params2 = rf_params
     rf_params1['bandwidth'] = bw1
     rf_params2['bandwidth'] = bw1
-    freq1 = str((float(freq) - float(bw2) / 2 - float(gap) / 2))
-    freq2 = str((float(freq) + float(bw1) / 2 + float(gap) / 2))
-    res = obw
+    rf_params1['freq'] = freq1
+    rf_params2['freq'] = freq2
+    res = [obw(v, rf_params1, span1, rel, atten, rbw, count, point, current1, rename1, exs, snap, snappath1, delay),
+           obw(v, rf_params2, span2, rel, atten, rbw, count, point, current2, rename2, exs, snap, snappath2, delay)]
+    return res
 
 
 def ccdf(v: VisaConnection, rf_params: Dict[str, str], abw: int,

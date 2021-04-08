@@ -82,7 +82,7 @@ class Testing:
     def measure(self, rf_params: Dict[str, str]):
         wb = load_workbook("./report/%s.xlsx" % file_dict[rf_params.get('branch')])
         ws = wb["TM%s_%s" % (rf_params.get('mode'), rf_params.get('bandwidth'))]
-        row = newline(ws, init_row=3)
+        row = new_line(ws, init_row=3)
 
         # basic information
         res_basic = [int(rf_params.get('temp')), int(rf_params.get('bandwidth')), float(rf_params.get('freq')),

@@ -37,7 +37,7 @@ def hzlist_to_mhzlist(l: List) -> List[float]:
     return res
 
 
-def newline(ws: Worksheet, space: int = 1, init_row=1, col=1) -> int:
+def new_line(ws: Worksheet, space: int = 1, init_row: int = 1, col: int = 1) -> int:
     row = init_row
     while True:
         if ws.cell(row=row, column=col).value is None:
