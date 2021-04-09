@@ -6,8 +6,8 @@ from tools.function import *
 from tools.visa import VisaConnection
 
 
-def obw(v: VisaConnection, rf_params: Dict[str, str], span: int,
-        rel: float = 25, atten: int = 20, rbw: int = 30, count: int = 0, point: int = 10001,
+def obw(v: VisaConnection, rf_params: Dict[str, str],
+        span: int = None, rel: float = 25, atten: int = 20, rbw: int = 30, count: int = 0, point: int = None,
         current: str = None, rename: str = None,
         exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> float:
     """
@@ -33,6 +33,11 @@ def obw(v: VisaConnection, rf_params: Dict[str, str], span: int,
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
     bandwidth = rf_params.get('bandwidth')
+    if span is None:
+        # span = float(int(bandwidth) * 1.5)
+        span = float(bandwidth)
+    if point is None:
+        point = int(bandwidth) * 50 + 1
 
     if current is not None:
         v.send_cmd("INST '%s'" % current)
@@ -73,9 +78,9 @@ def obw(v: VisaConnection, rf_params: Dict[str, str], span: int,
     return hz_to_mhz(res)
 
 
-def multi_obw(v: VisaConnection, rf_params: Dict[str, str], span1: int, span2: int,
+def multi_obw(v: VisaConnection, rf_params: Dict[str, str], span1: int = None, span2: int = None,
               rel: float = 25, atten: int = 20, rbw: int = 30,
-              count1: int = 0, count2: int = 0, point1: int = 10001, point2: int = 10001,
+              count1: int = 0, count2: int = 0, point1: int = None, point2: int = None,
               current1: str = None, current2: str = None, rename1: str = None, rename2: str = None,
               exs: bool = False, snap: bool = False, snappath1: str = None, snappath2: str = None,
               delay: int = 5) -> List[float]:
@@ -90,7 +95,8 @@ def multi_obw(v: VisaConnection, rf_params: Dict[str, str], span1: int, span2: i
         bw2 = re.search("\+(.\d+)", bandwidth).group(1)
     freq1 = str((float(freq) - float(bw2) / 2 - float(gap) / 2))
     freq2 = str((float(freq) + float(bw1) / 2 + float(gap) / 2))
-    rf_params1 = rf_params2 = rf_params
+    rf_params1 = rf_params.copy()
+    rf_params2 = rf_params.copy()
     rf_params1['bandwidth'] = bw1
     rf_params2['bandwidth'] = bw1
     rf_params1['freq'] = freq1
@@ -1186,7 +1192,7 @@ def nr5g_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
     v.send_cmd("MMEM:LOAD:TMOD:CC1 '%s'" % t_mode1)
     v.send_cmd("CONF:NR5G:DL:CC1:PLC:CID 1")
     v.send_cmd("MMEM:LOAD:TMOD:CC2 '%s'" % t_mode2)
-    v.send_cmd("CONF:NR5G:DL:CC2:PLC:CID 1")
+    v.send_cmd("CONF:NR5G:DL:CC2:PLC:CID 2")
     freq1 = int((float(freq) - float(bw2) / 2 - float(gap) / 2) * 1e6)
     freq2 = int((float(freq) + float(bw1) / 2 + float(gap) / 2) * 1e6)
     v.send_cmd("SENS:FREQ:CENT:CC1 %d" % freq1)

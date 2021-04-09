@@ -33,11 +33,7 @@ if __name__ == '__main__':
                         else:
                             gap = "0"
                             bw2 = re.search("\+(.\d+)", bandwidth).group(1)
-                        span1 = int(int(bw1) * 1.5)
-                        span2 = int(int(bw2) * 1.5)
                         abw = abw_dict.get(str(int(bw1)+int(gap)+int(bw2)))
-                        p1 = int(bw1) * 50 + 1
-                        p2 = int(bw2) * 50 + 1
 
                         ############## 2 Carriers NR5G ##############
                         if pipe == "0":
@@ -48,8 +44,7 @@ if __name__ == '__main__':
                             # OBW
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'OBW1'")
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'OBW2'")
-                            res_obw = multi_obw(v, rf_params, span1=span1, span2=span2, current1="OBW1",
-                                                current2="OBW2", point1=p1, point2=p2, exs=True)
+                            res_obw = multi_obw(v, rf_params, current1="OBW1", current2="OBW2", exs=True)
                             # CCDF
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'CCDF'")
                             res_ccdf = ccdf(v, rf_params, abw, current="CCDF", exs=True)
@@ -64,14 +59,14 @@ if __name__ == '__main__':
                             res_se = se(v, rf_params, current="SE")
 
                             fr.next_line()
-                            fr.fill_xl_value(FillReport.BASIC, res_basic)
-                            fr.fill_xl_value(FillReport.MADURA, res_madura)
-                            fr.fill_xl_value(FillReport.NR5G_MULTI_ACP, res_acp)
-                            fr.fill_xl_value(FillReport.MULTI_OBW, res_obw)
-                            fr.fill_xl_value(FillReport.CCDF, res_ccdf)
-                            fr.fill_xl_value(FillReport.NR5G_MULTI_EVM, res_evm)
-                            fr.fill_xl_value(FillReport.NR5G_MULTI_SEM, res_sem)
-                            fr.fill_xl_value(FillReport.SE, res_se)
+                            fr.fill_xl_value(FillReport.BASIC, res_basic, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.MADURA, res_madura, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.NR5G_MULTI_ACP, res_acp, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.MULTI_OBW, res_obw, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.CCDF, res_ccdf, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.NR5G_MULTI_EVM, res_evm, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.NR5G_MULTI_SEM, res_sem, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.SE, res_se, mode_extra=mode)
 
                         ############## 2 Carriers LTE ##############
                         elif pipe in ("1", "2"):
@@ -82,8 +77,7 @@ if __name__ == '__main__':
                             # OBW
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'OBW1'")
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'OBW2'")
-                            res_obw = multi_obw(v, rf_params, span1=span1, span2=span2, current1="OBW1",
-                                                current2="OBW2", point1=p1, point2=p2)
+                            res_obw = multi_obw(v, rf_params, current1="OBW1", current2="OBW2")
                             # CCDF
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'CCDF'")
                             res_ccdf = ccdf(v, rf_params, abw, current="CCDF")
@@ -98,20 +92,19 @@ if __name__ == '__main__':
                             res_se = se(v, rf_params, current="SE")
 
                             fr.next_line()
-                            fr.fill_xl_value(FillReport.BASIC, res_basic)
-                            fr.fill_xl_value(FillReport.MADURA, res_madura)
-                            fr.fill_xl_value(FillReport.LTE_MULTI_ACP, res_acp)
-                            fr.fill_xl_value(FillReport.MULTI_OBW, res_obw)
-                            fr.fill_xl_value(FillReport.CCDF, res_ccdf)
-                            fr.fill_xl_value(FillReport.LTE_MULTI_EVM, res_evm)
-                            fr.fill_xl_value(FillReport.LTE_MULTI_SEM, res_sem)
-                            fr.fill_xl_value(FillReport.SE, res_se)
+                            fr.fill_xl_value(FillReport.BASIC, res_basic, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.MADURA, res_madura, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.LTE_MULTI_ACP, res_acp, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.MULTI_OBW, res_obw, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.CCDF, res_ccdf, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.LTE_MULTI_EVM, res_evm, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.LTE_MULTI_SEM, res_sem, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.SE, res_se, mode_extra=mode)
 
                     ############## 1 Carrier ##############
                     else:
-                        span = int(int(bandwidth) * 1.5)
                         abw = abw_dict.get(bandwidth)
-                        p = int(bandwidth) * 50 + 1
+
                         ############## 1 Carrier NR5G ##############
                         if pipe == "0":
                             # ACP
@@ -120,7 +113,7 @@ if __name__ == '__main__':
                             res_acp = nr5g_acp(v, rf_params, current="ACP", exs=True)
                             # OBW
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'OBW'")
-                            res_obw = obw(v, rf_params, span=span, current="OBW", point=p, exs=True)
+                            res_obw = obw(v, rf_params, current="OBW", exs=True)
                             # CCDF
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'CCDF'")
                             res_ccdf = ccdf(v, rf_params, abw, current="CCDF", exs=True)
@@ -135,14 +128,14 @@ if __name__ == '__main__':
                             res_se = se(v, rf_params, current="SE")
 
                             fr.next_line()
-                            fr.fill_xl_value(FillReport.BASIC, res_basic)
-                            fr.fill_xl_value(FillReport.MADURA, res_madura)
-                            fr.fill_xl_value(FillReport.NR5G_ACP, res_acp)
-                            fr.fill_xl_value(FillReport.OBW, res_obw)
-                            fr.fill_xl_value(FillReport.CCDF, res_ccdf)
-                            fr.fill_xl_value(FillReport.NR5G_EVM, res_evm)
-                            fr.fill_xl_value(FillReport.NR5G_SEM, res_sem)
-                            fr.fill_xl_value(FillReport.SE, res_se)
+                            fr.fill_xl_value(FillReport.BASIC, res_basic, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.MADURA, res_madura, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.NR5G_ACP, res_acp, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.OBW, res_obw, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.CCDF, res_ccdf, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.NR5G_EVM, res_evm, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.NR5G_SEM, res_sem, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.SE, res_se, mode_extra=mode)
 
                         ############## 1 Carrier LTE ##############
                         elif pipe in ("1", "2"):
@@ -152,7 +145,7 @@ if __name__ == '__main__':
                             res_acp = lte_acp(v, rf_params, current="ACP")
                             # OBW
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'OBW'")
-                            res_obw = obw(v, rf_params, span=span, current="OBW", point=p)
+                            res_obw = obw(v, rf_params, current="OBW")
                             # CCDF
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'CCDF'")
                             res_ccdf = ccdf(v, rf_params, abw, current="CCDF")
@@ -167,11 +160,11 @@ if __name__ == '__main__':
                             res_se = se(v, rf_params, current="SE")
 
                             fr.next_line()
-                            fr.fill_xl_value(FillReport.BASIC, res_basic)
-                            fr.fill_xl_value(FillReport.MADURA, res_madura)
-                            fr.fill_xl_value(FillReport.LTE_ACP, res_acp)
-                            fr.fill_xl_value(FillReport.OBW, res_obw)
-                            fr.fill_xl_value(FillReport.CCDF, res_ccdf)
-                            fr.fill_xl_value(FillReport.LTE_EVM, res_evm)
-                            fr.fill_xl_value(FillReport.LTE_SEM, res_sem)
-                            fr.fill_xl_value(FillReport.SE, res_se)
+                            fr.fill_xl_value(FillReport.BASIC, res_basic, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.MADURA, res_madura, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.LTE_ACP, res_acp, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.OBW, res_obw, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.CCDF, res_ccdf, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.LTE_EVM, res_evm, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.LTE_SEM, res_sem, mode_extra=mode)
+                            fr.fill_xl_value(FillReport.SE, res_se, mode_extra=mode)
