@@ -47,7 +47,7 @@ if __name__ == '__main__':
                             res_obw = multi_obw(v, rf_params, current1="OBW1", current2="OBW2", exs=True)
                             # CCDF
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'CCDF'")
-                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF", exs=True)
+                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF", samp_num=1000000 ,exs=True)
                             # EVM
                             v.send_cmd("INST:CRE:NEW NR5G, 'EVM'")
                             res_evm = nr5g_multi_evm(v, rf_params, current="EVM", exs=True)
@@ -116,7 +116,7 @@ if __name__ == '__main__':
                             res_obw = obw(v, rf_params, current="OBW", exs=True)
                             # CCDF
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'CCDF'")
-                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF", exs=True)
+                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF", samp_num=1000000 ,exs=True)
                             # EVM
                             v.send_cmd("INST:CRE:NEW NR5G, 'EVM'")
                             res_evm = nr5g_evm(v, rf_params, current="EVM", exs=True)

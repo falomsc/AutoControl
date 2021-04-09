@@ -107,6 +107,7 @@ def multi_obw(v: VisaConnection, rf_params: Dict[str, str], span1: int = None, s
 
 
 def ccdf(v: VisaConnection, rf_params: Dict[str, str], abw: int,
+         samp_num = 100000,
          rel: float = 25, atten: int = 20,
          current: str = None, rename: str = None,
          exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
@@ -139,12 +140,14 @@ def ccdf(v: VisaConnection, rf_params: Dict[str, str], abw: int,
 
     if exs:
         v.send_cmd("TRIG:SOUR EXT")
+        v.send_cmd("SENS:SWE:EGAT:TRAC1:STAT ON")
     v.send_cmd("FREQ:CENT %sMHz" % freq)
     v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
     v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
     v.send_cmd("INP:ATT %ddB" % atten)
 
     v.send_cmd("BAND %d MHz" % abw)
+    v.send_cmd("CALC1:STAT:NSAM %d" % samp_num)
 
     # v.send_cmd("INIT:CONT OFF")
     # v.send_cmd("INIT;*WAI")
