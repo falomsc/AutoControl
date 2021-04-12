@@ -1,0 +1,60 @@
+//-----------Configuring the measurement ------------
+*RST
+//Reset the instrument
+TRIG:SOUR EXT
+//Defines the use of an external trigger.
+TRIG:HOLD 25us
+//Defines a trigger offset of 25 µs.
+CALC:STAT:APD ON
+//Activates APD measurement.
+CALC:STAT:NSAM 1000
+//Sets the number of samples to be included in the statistical evaluation to 1000.
+
+//-------------Defining Gate ranges -----------------
+
+SWE:EGAT:TRAC1:COMM 'GSM - useful part'
+//Defines a comment for the gate
+SWE:EGAT:TRAC1:PER 4.61536ms
+//Sets the gate period to 4.61536ms.
+SWE:EGAT:TRAC1:STAR1 15us
+//Sets the start of range 1 to 15 µs.
+SWE:EGAT:TRAC1:STOP1 557.8us
+//Sets the end of range 1 to 15 µs (start time) + 542.77 µs (useful part) = 557.8 µs.
+SWE:EGAT:TRAC1:STAT1 ON
+//Activates the use of range 1.
+
+//--------------Performing the Measurement-----
+INIT:CONT OFF
+//Selects single sweep mode.
+INIT;*WAI
+//Initiates a new measurement and waits until the sweep has finished.
+
+//---------------Retrieving Results-------------
+CALC:STAT:RES1? MEAN
+//Returns the mean average power for the useful part of the GSM signal.
+
+//------------- Determining the CCDF values-------------------
+
+CALC:STAT:CCDF ON
+//Activates CCDF measurement.
+CALC:MARK2:Y:PERC 95PCT
+//Sets marker 2 to the 95% probability value.
+INIT;*WAI
+//Initiates a new measurement and waits until the sweep has finished.
+CALC:STAT:CCDF:X? P1
+//Returns the level value for 10% probability for the CCDF.
+CALC:MARK2:X?
+//Returns the level for a probability of 95%.
+
+
+//----------- Scaling the diagram -------------------------
+CALC:STAT:SCAL:X:RLEV -70dBm
+//Sets the reference level to -70 dBm (x-axis!)
+CALC:STAT:SCAL:X:RANG 20dB
+//Defines a power level range of 20 dB for the x-axis
+CALC:STAT:SCAL:Y:LOW 0.0001
+//Sets the minimum of the y-axis to 0.01% probability
+CALC:STAT:SCAL:Y:UPP 1.0
+//Sets the maximum of the y-axis to 100% probability
+CALC:STAT:SCAL:Y:UNIT PCT
+//Displays percentage values on y-axis scale

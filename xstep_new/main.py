@@ -24,6 +24,9 @@ if __name__ == '__main__':
                                  int(rf_params.get('branch')), float(rf_params.get('freq')),
                                  float(rf_params.get('power'))]
                     res_madura = get_clgc_and_pa_temperature(s, rf_params)
+                    ############## notion ##############
+                    input("Please conform the information: branch: {branch}, freq: {freq}, mode: {mode}, bw: {bandwidth}".format(**rf_params))
+
                     ############## 2 Carriers ##############
                     if bandwidth.find('+') > -1:
                         bw1 = re.match("(.\d+)", bandwidth).group(1)
@@ -40,23 +43,30 @@ if __name__ == '__main__':
                             # ACP
                             v.send_cmd("*RST")
                             v.send_cmd("INST:CRE:NEW NR5G, 'ACP'")
-                            res_acp = nr5g_multi_acp(v, rf_params, current="ACP", exs=True)
+                            res_acp = nr5g_multi_acp(v, rf_params, current="ACP", exs=True,
+                                                     snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_1.JPG".format(**rf_params))
                             # OBW
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'OBW1'")
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'OBW2'")
-                            res_obw = multi_obw(v, rf_params, current1="OBW1", current2="OBW2", exs=True)
+                            res_obw = multi_obw(v, rf_params, current1="OBW1", current2="OBW2", exs=True,
+                                                snappath1="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_2_1.JPG".format(**rf_params),
+                                                snappath2="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_2_2.JPG".format(**rf_params))
                             # CCDF
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'CCDF'")
-                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF", samp_num=1000000 ,exs=True)
+                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF", samp_num=1000000, exs=True,
+                                            snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_3.JPG".format(**rf_params))
                             # EVM
                             v.send_cmd("INST:CRE:NEW NR5G, 'EVM'")
-                            res_evm = nr5g_multi_evm(v, rf_params, current="EVM", exs=True)
+                            res_evm = nr5g_multi_evm(v, rf_params, current="EVM", exs=True,
+                                                     snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_4.JPG".format(**rf_params))
                             # SEM
                             v.send_cmd("INST:CRE:NEW NR5G, 'SEM'")
-                            res_sem = nr5g_multi_sem(v, rf_params, current="SEM", exs=True)
+                            res_sem = nr5g_multi_sem(v, rf_params, current="SEM", exs=True,
+                                                     snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_5.JPG".format(**rf_params))
                             # SE
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'SE'")
-                            res_se = se(v, rf_params, current="SE")
+                            res_se = se(v, rf_params, current="SE",
+                                        snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_6.JPG".format(**rf_params))
 
                             fr.next_line()
                             fr.fill_xl_value(FillReport.BASIC, res_basic, mode_extra=mode)
@@ -73,23 +83,30 @@ if __name__ == '__main__':
                             # ACP
                             v.send_cmd("*RST")
                             v.send_cmd("NST:CRE:NEW LTE, 'ACP'")
-                            res_acp = lte_multi_acp(v, rf_params, current="ACP")
+                            res_acp = lte_multi_acp(v, rf_params, current="ACP",
+                                                    snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_1.JPG".format(**rf_params))
                             # OBW
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'OBW1'")
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'OBW2'")
-                            res_obw = multi_obw(v, rf_params, current1="OBW1", current2="OBW2")
+                            res_obw = multi_obw(v, rf_params, current1="OBW1", current2="OBW2",
+                                                snappath1="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_2_1.JPG".format(**rf_params),
+                                                snappath2="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_2_2.JPG".format(**rf_params))
                             # CCDF
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'CCDF'")
-                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF")
+                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF",
+                                            snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_3.JPG".format(**rf_params))
                             # EVM
                             v.send_cmd("NST:CRE:NEW LTE, 'EVM'")
-                            res_evm = lte_multi_evm(v, rf_params, current="EVM")
+                            res_evm = lte_multi_evm(v, rf_params, current="EVM",
+                                                    snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_4.JPG".format(**rf_params))
                             # SEM
                             v.send_cmd("NST:CRE:NEW LTE, 'SEM'")
-                            res_sem = lte_multi_sem(v, rf_params, current="SEM")
+                            res_sem = lte_multi_sem(v, rf_params, current="SEM",
+                                                    snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_5.JPG".format(**rf_params))
                             # SE
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'SE'")
-                            res_se = se(v, rf_params, current="SE")
+                            res_se = se(v, rf_params, current="SE",
+                                        snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_6.JPG".format(**rf_params))
 
                             fr.next_line()
                             fr.fill_xl_value(FillReport.BASIC, res_basic, mode_extra=mode)
@@ -110,22 +127,28 @@ if __name__ == '__main__':
                             # ACP
                             v.send_cmd("*RST")
                             v.send_cmd("INST:CRE:NEW NR5G, 'ACP'")
-                            res_acp = nr5g_acp(v, rf_params, current="ACP", exs=True)
+                            res_acp = nr5g_acp(v, rf_params, current="ACP", exs=True,
+                                               snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_1.JPG".format(**rf_params))
                             # OBW
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'OBW'")
-                            res_obw = obw(v, rf_params, current="OBW", exs=True)
+                            res_obw = obw(v, rf_params, current="OBW", exs=True,
+                                          snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_2.JPG".format(**rf_params))
                             # CCDF
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'CCDF'")
-                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF", samp_num=1000000 ,exs=True)
+                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF", samp_num=1000000, exs=True,
+                                            snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_3.JPG".format(**rf_params))
                             # EVM
                             v.send_cmd("INST:CRE:NEW NR5G, 'EVM'")
-                            res_evm = nr5g_evm(v, rf_params, current="EVM", exs=True)
+                            res_evm = nr5g_evm(v, rf_params, current="EVM", exs=True,
+                                               snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_4.JPG".format(**rf_params))
                             # SEM
                             v.send_cmd("INST:CRE:NEW NR5G, 'SEM'")
-                            res_sem = nr5g_sem(v, rf_params, current="SEM", exs=True)
+                            res_sem = nr5g_sem(v, rf_params, current="SEM", exs=True,
+                                               snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_5.JPG".format(**rf_params))
                             # SE
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'SE'")
-                            res_se = se(v, rf_params, current="SE")
+                            res_se = se(v, rf_params, current="SE",
+                                        snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_6.JPG".format(**rf_params))
 
                             fr.next_line()
                             fr.fill_xl_value(FillReport.BASIC, res_basic, mode_extra=mode)
@@ -142,22 +165,28 @@ if __name__ == '__main__':
                             # ACP
                             v.send_cmd("*RST")
                             v.send_cmd("INST:CRE:NEW LTE, 'ACP'")
-                            res_acp = lte_acp(v, rf_params, current="ACP")
+                            res_acp = lte_acp(v, rf_params, current="ACP",
+                                              snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_1.JPG".format(**rf_params))
                             # OBW
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'OBW'")
-                            res_obw = obw(v, rf_params, current="OBW")
+                            res_obw = obw(v, rf_params, current="OBW",
+                                          snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_2.JPG".format(**rf_params))
                             # CCDF
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'CCDF'")
-                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF")
+                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF",
+                                            snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_3.JPG".format(**rf_params))
                             # EVM
                             v.send_cmd("INST:CRE:NEW LTE, 'EVM'")
-                            res_evm = lte_evm(v, rf_params, current="SEM")
+                            res_evm = lte_evm(v, rf_params, current="EVM",
+                                              snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_4.JPG".format(**rf_params))
                             # SEM
                             v.send_cmd("INST:CRE:NEW LTE, 'SEM'")
-                            res_sem = lte_sem(v, rf_params, current="SEM")
+                            res_sem = lte_sem(v, rf_params, current="SEM",
+                                              snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_5.JPG".format(**rf_params))
                             # SE
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'SE'")
-                            res_se = se(v, rf_params, current="SE")
+                            res_se = se(v, rf_params, current="SE",
+                                        snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_6.JPG".format(**rf_params))
 
                             fr.next_line()
                             fr.fill_xl_value(FillReport.BASIC, res_basic, mode_extra=mode)

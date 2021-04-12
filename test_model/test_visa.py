@@ -8,19 +8,24 @@ v = VisaConnection("TCPIP0::192.168.0.130::inst0::INSTR", timeout=100000)
 # res = lte_multi_sem(v, rf_params)
 # for i in res:
 #     print(res)
-
+v.send_cmd("SENS:SWE:EGAT ON")
+# v.send_cmd("SWE:EGAT:TRAC1:PER 4.61536ms")
+# v.send_cmd("SWE:EGAT:TRAC1:STAR1 15us")
+# v.send_cmd("SWE:EGAT:TRAC1:STOP1 557.8us")
+# v.send_cmd("SWE:EGAT:TRAC1:STAT1 OFF")
+# v.send_cmd(":CALC:STAT:SCAL:AUTO ONCE")
 # v.send_cmd("*RST")
 # v.send_cmd("INST:CRE:NEW SANALYZER, 'Spectrum'")
 # res = v.rec_cmd("CALC:MARK:FUNC:POW:RES? ACP").split(",")
 # for i in res:
 #     print(float(i))
 
-rf_params = {"pipe": "0", "freq": "3550", "loss": "28.9", "bandwidth": "50+gap90+60", "mode": "TM3_1"}
-v.send_cmd("*RST")
-v.send_cmd("INST:CRE:NEW NR5G, '5G NR'")
-res = nr5g_multi_sem(v, rf_params, exs=True)
-for i in res:
-    print(i)
+# rf_params = {"pipe": "0", "freq": "3550", "loss": "28.9", "bandwidth": "50+gap90+60", "mode": "TM3_1"}
+# v.send_cmd("*RST")
+# v.send_cmd("INST:CRE:NEW NR5G, '5G NR'")
+# res = nr5g_multi_sem(v, rf_params, exs=True)
+# for i in res:
+#     print(i)
 
 
 # res1 = v.rec_cmd("CALC:MARK:FUNC:POW1:RES? CPOW")

@@ -9,7 +9,7 @@ from tools.visa import VisaConnection
 def obw(v: VisaConnection, rf_params: Dict[str, str],
         span: int = None, rel: float = 25, atten: int = 20, rbw: int = 30, count: int = 0, point: int = None,
         current: str = None, rename: str = None,
-        exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> float:
+        exs: bool = False, snappath: str = None, delay: int = 5) -> float:
     """
     Create a channel first
     INST:CRE:NEW SANALYZER, 'Spectrum'
@@ -25,7 +25,6 @@ def obw(v: VisaConnection, rf_params: Dict[str, str],
     :param current: Current Name
     :param rename: Rename
     :param exs: Is External Trigger
-    :param snap: Enable SnapShot
     :param snappath: Path of SnapShot
     :param delay: Time Delay
     :return:
@@ -67,7 +66,7 @@ def obw(v: VisaConnection, rf_params: Dict[str, str],
     # v.send_cmd("INIT;*WAI")
     time.sleep(delay)
 
-    if snap:
+    if snappath is not None:
         v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
         v.send_cmd("HCOP:DEV:LANG1 JPG")
         v.send_cmd("HCOP:CMAP:DEF4")
@@ -82,8 +81,31 @@ def multi_obw(v: VisaConnection, rf_params: Dict[str, str], span1: int = None, s
               rel: float = 25, atten: int = 20, rbw: int = 30,
               count1: int = 0, count2: int = 0, point1: int = None, point2: int = None,
               current1: str = None, current2: str = None, rename1: str = None, rename2: str = None,
-              exs: bool = False, snap: bool = False, snappath1: str = None, snappath2: str = None,
+              exs: bool = False, snappath1: str = None, snappath2: str = None,
               delay: int = 5) -> List[float]:
+    """
+
+    :param v:
+    :param rf_params:
+    :param span1:
+    :param span2:
+    :param rel:
+    :param atten:
+    :param rbw:
+    :param count1:
+    :param count2:
+    :param point1:
+    :param point2:
+    :param current1:
+    :param current2:
+    :param rename1:
+    :param rename2:
+    :param exs:
+    :param snappath1:
+    :param snappath2:
+    :param delay:
+    :return:
+    """
     bandwidth = rf_params.get('bandwidth')
     freq = rf_params.get('freq')
     bw1 = re.match("(.\d+)", bandwidth).group(1)
@@ -101,27 +123,27 @@ def multi_obw(v: VisaConnection, rf_params: Dict[str, str], span1: int = None, s
     rf_params2['bandwidth'] = bw1
     rf_params1['freq'] = freq1
     rf_params2['freq'] = freq2
-    res = [obw(v, rf_params1, span1, rel, atten, rbw, count1, point1, current1, rename1, exs, snap, snappath1, delay),
-           obw(v, rf_params2, span2, rel, atten, rbw, count2, point2, current2, rename2, exs, snap, snappath2, delay)]
+    res = [obw(v, rf_params1, span1, rel, atten, rbw, count1, point1, current1, rename1, exs, snappath1, delay),
+           obw(v, rf_params2, span2, rel, atten, rbw, count2, point2, current2, rename2, exs, snappath2, delay)]
     return res
 
 
 def ccdf(v: VisaConnection, rf_params: Dict[str, str], abw: int,
-         samp_num = 100000,
+         samp_num=100000,
          rel: float = 25, atten: int = 20,
          current: str = None, rename: str = None,
-         exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
+         exs: bool = False,snappath: str = None, delay: int = 5) -> List[float]:
     """
     INST:CRE:NEW SANALYZER, 'Spectrum'
     :param v:
     :param rf_params:
     :param abw: Analysis BW(MHz)
+    :param samp_num:
     :param rel:
     :param atten:
     :param current:
     :param rename:
     :param exs:
-    :param snap:
     :param snappath:
     :param delay:
     :return:
@@ -140,7 +162,7 @@ def ccdf(v: VisaConnection, rf_params: Dict[str, str], abw: int,
 
     if exs:
         v.send_cmd("TRIG:SOUR EXT")
-        v.send_cmd("SENS:SWE:EGAT:TRAC1:STAT ON")
+        v.send_cmd("SENS:SWE:EGAT ON")
     v.send_cmd("FREQ:CENT %sMHz" % freq)
     v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
     v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
@@ -153,7 +175,7 @@ def ccdf(v: VisaConnection, rf_params: Dict[str, str], abw: int,
     # v.send_cmd("INIT;*WAI")
     time.sleep(delay)
 
-    if snap:
+    if snappath is not None:
         v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
         v.send_cmd("HCOP:DEV:LANG1 JPG")
         v.send_cmd("HCOP:CMAP:DEF4")
@@ -167,11 +189,12 @@ def ccdf(v: VisaConnection, rf_params: Dict[str, str], abw: int,
     res.append(v.rec_cmd("CALC:STAT:CCDF:X1? P0_01"))
     return strlist_to_floatlist(res)
 
+
 # TODO condition: exs=True
 def se(v: VisaConnection, rf_params: Dict[str, str],
        rel: float = 25, atten: int = 10,
        current: str = None, rename: str = None,
-       exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 10) -> List[float]:
+       exs: bool = False, snappath: str = None, delay: int = 10) -> List[float]:
     """
 
     :param v:
@@ -181,7 +204,6 @@ def se(v: VisaConnection, rf_params: Dict[str, str],
     :param current:
     :param rename:
     :param exs:
-    :param snap:
     :param snappath:
     :param delay:
     :return:
@@ -236,7 +258,7 @@ def se(v: VisaConnection, rf_params: Dict[str, str],
     v.send_cmd("SENS:LIST:XADJ;*WAI")
     v.send_cmd("INIT:SPUR; *WAI")
 
-    if snap:
+    if snappath is not None:
         v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
         v.send_cmd("HCOP:DEV:LANG1 JPG")
         v.send_cmd("HCOP:CMAP:DEF4")
@@ -257,9 +279,9 @@ def se(v: VisaConnection, rf_params: Dict[str, str],
 
 
 def lte_acp(v: VisaConnection, rf_params: Dict[str, str],
-             rel: float = 25, atten: int = 5,
-             current: str = None, rename: str = None,
-             exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
+            rel: float = 25, atten: int = 5,
+            current: str = None, rename: str = None,
+            exs: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
     """
     INST:CRE:NEW LTE, 'LTE'
     :param v:
@@ -269,7 +291,6 @@ def lte_acp(v: VisaConnection, rf_params: Dict[str, str],
     :param current:
     :param rename:
     :param exs:
-    :param snap:
     :param snappath:
     :param delay:
     :return:
@@ -306,7 +327,7 @@ def lte_acp(v: VisaConnection, rf_params: Dict[str, str],
     # v.send_cmd("INIT;*WAI")
     time.sleep(delay)
 
-    if snap:
+    if snappath is not None:
         v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
         v.send_cmd("HCOP:DEV:LANG1 JPG")
         v.send_cmd("HCOP:CMAP:DEF4")
@@ -318,9 +339,9 @@ def lte_acp(v: VisaConnection, rf_params: Dict[str, str],
 
 
 def lte_multi_acp(v: VisaConnection, rf_params: Dict[str, str],
-                   rel: float = 25, atten: int = 5,
-                   current: str = None, rename: str = None,
-                   exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
+                  rel: float = 25, atten: int = 5,
+                  current: str = None, rename: str = None,
+                  exs: bool = False, snappath: str = None, delay: int = 5) -> List[float]:
     """
 
     :param v:
@@ -330,7 +351,6 @@ def lte_multi_acp(v: VisaConnection, rf_params: Dict[str, str],
     :param current:
     :param rename:
     :param exs:
-    :param snap:
     :param snappath:
     :param delay:
     :return:
@@ -395,7 +415,7 @@ def lte_multi_acp(v: VisaConnection, rf_params: Dict[str, str],
     # v.send_cmd("INIT;*WAI")
     time.sleep(delay)
 
-    if snap:
+    if snappath is not None:
         v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
         v.send_cmd("HCOP:DEV:LANG1 JPG")
         v.send_cmd("HCOP:CMAP:DEF4")
@@ -413,7 +433,7 @@ def lte_multi_acp(v: VisaConnection, rf_params: Dict[str, str],
 def lte_evm(v: VisaConnection, rf_params: Dict[str, str],
             rel: float = 25, atten: int = 20,
             current: str = None, rename: str = None,
-            exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[List[float]]:
+            exs: bool = False, snappath: str = None, delay: int = 5) -> List[List[float]]:
     """
     INST:CRE:NEW LTE, 'LTE'
     :param v:
@@ -423,7 +443,6 @@ def lte_evm(v: VisaConnection, rf_params: Dict[str, str],
     :param current:
     :param rename:
     :param exs:
-    :param snap:
     :param snappath:
     :param delay:
     :return:
@@ -467,7 +486,7 @@ def lte_evm(v: VisaConnection, rf_params: Dict[str, str],
     # v.send_cmd("INIT;*WAI")
     time.sleep(delay)
 
-    if snap:
+    if snappath is not None:
         v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
         v.send_cmd("HCOP:DEV:LANG1 JPG")
         v.send_cmd("HCOP:CMAP:DEF4")
@@ -533,7 +552,7 @@ def lte_evm(v: VisaConnection, rf_params: Dict[str, str],
 def lte_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
                   rel: float = 25, atten: int = 20,
                   current: str = None, rename: str = None,
-                  exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[List[float]]:
+                  exs: bool = False, snappath: str = None, delay: int = 5) -> List[List[float]]:
     """
 
     :param v:
@@ -543,7 +562,6 @@ def lte_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
     :param current:
     :param rename:
     :param exs:
-    :param snap:
     :param snappath:
     :param delay:
     :return:
@@ -603,7 +621,7 @@ def lte_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
     # v.send_cmd("INIT;*WAI")
     time.sleep(delay)
 
-    if snap:
+    if snappath is not None:
         v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
         v.send_cmd("HCOP:DEV:LANG1 JPG")
         v.send_cmd("HCOP:CMAP:DEF4")
@@ -672,7 +690,7 @@ def lte_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
 def lte_sem(v: VisaConnection, rf_params: Dict[str, str],
             rel: float = 25, atten: int = 15,
             current: str = None, rename: str = None,
-            exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 10) -> List[float]:
+            exs: bool = False, snappath: str = None, delay: int = 10) -> List[float]:
     """
 
     :param v:
@@ -682,7 +700,6 @@ def lte_sem(v: VisaConnection, rf_params: Dict[str, str],
     :param current:
     :param rename:
     :param exs:
-    :param snap:
     :param snappath:
     :param delay:
     :return:
@@ -720,9 +737,9 @@ def lte_sem(v: VisaConnection, rf_params: Dict[str, str],
     # v.send_cmd("SENS:ESP1:RANG1:FREQ:STOP -15050000")
     # v.send_cmd("SENS:ESP1:RANG7:FREQ:STAR 15050000")
     # v.send_cmd("SENS:ESP1:RANG7:FREQ:STAR 15050000")
-    v.send_cmd("SENS:ESP1:RANG1:FREQ:STOP -%d" % int((float(bandwidth)/2 + 5.05) * 1e6))
-    v.send_cmd("SENS:ESP1:RANG7:FREQ:STAR %d" % int((float(bandwidth)/2 + 5.05) * 1e6))
-    v.send_cmd("SENS:ESP1:RANG7:FREQ:STAR %d" % int((float(bandwidth)/2 + 5.05) * 1e6))
+    v.send_cmd("SENS:ESP1:RANG1:FREQ:STOP -%d" % int((float(bandwidth) / 2 + 5.05) * 1e6))
+    v.send_cmd("SENS:ESP1:RANG7:FREQ:STAR %d" % int((float(bandwidth) / 2 + 5.05) * 1e6))
+    v.send_cmd("SENS:ESP1:RANG7:FREQ:STAR %d" % int((float(bandwidth) / 2 + 5.05) * 1e6))
 
     for i in range(7):
         v.send_cmd("SENS:ESP1:RANG%d:INP:ATT %d" % ((i + 1), atten))
@@ -735,7 +752,7 @@ def lte_sem(v: VisaConnection, rf_params: Dict[str, str],
     v.send_cmd("INIT;*WAI")
     time.sleep(delay)
 
-    if snap:
+    if snappath is not None:
         v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
         v.send_cmd("HCOP:DEV:LANG1 JPG")
         v.send_cmd("HCOP:CMAP:DEF4")
@@ -756,7 +773,7 @@ def lte_sem(v: VisaConnection, rf_params: Dict[str, str],
 def lte_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
                   rel: float = 25, atten: int = 15,
                   current: str = None, rename: str = None,
-                  exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 10) -> List[float]:
+                  exs: bool = False, snappath: str = None, delay: int = 10) -> List[float]:
     """
 
     :param v:
@@ -766,7 +783,6 @@ def lte_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
     :param current:
     :param rename:
     :param exs:
-    :param snap:
     :param snappath:
     :param delay:
     :return:
@@ -812,32 +828,33 @@ def lte_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
     # v.send_cmd("INIT:CONT OFF")
 
     for i, bw in enumerate((bw1, bw2)):
-        v.send_cmd("SENS:ESP%d:PRES:STAN 'C:\R_S\Instr\sem_std\EUTRA-LTE\SEM_DL_BW%s_00_LocalArea_FSW.xml'" % (i+1, bandwidth))
-        v.send_cmd("SENS:ESP%d:RANG2:DEL" % (i+1))
-        v.send_cmd("SENS:ESP%d:RANG7:DEL" % (i+1))
-        v.send_cmd("SENS:ESP%d:RANG1:FREQ:STOP -%d" % (i+1, int((float(bw)/2 + 5.05) * 1e6)))
-        v.send_cmd("SENS:ESP%d:RANG7:FREQ:STAR %d" % (i+1, int((float(bw)/2 + 5.05) * 1e6)))
-        v.send_cmd("SENS:ESP%d:RANG7:FREQ:STAR %d" % (i+1, int((float(bw)/2 + 5.05) * 1e6)))
+        v.send_cmd("SENS:ESP%d:PRES:STAN 'C:\R_S\Instr\sem_std\EUTRA-LTE\SEM_DL_BW%s_00_LocalArea_FSW.xml'" % (
+        i + 1, bandwidth))
+        v.send_cmd("SENS:ESP%d:RANG2:DEL" % (i + 1))
+        v.send_cmd("SENS:ESP%d:RANG7:DEL" % (i + 1))
+        v.send_cmd("SENS:ESP%d:RANG1:FREQ:STOP -%d" % (i + 1, int((float(bw) / 2 + 5.05) * 1e6)))
+        v.send_cmd("SENS:ESP%d:RANG7:FREQ:STAR %d" % (i + 1, int((float(bw) / 2 + 5.05) * 1e6)))
+        v.send_cmd("SENS:ESP%d:RANG7:FREQ:STAR %d" % (i + 1, int((float(bw) / 2 + 5.05) * 1e6)))
 
         for j in range(7):
-            v.send_cmd("SENS:ESP%d:RANG%d:INP:ATT %d" % ((i+1), (j+1), atten))
-        v.send_cmd("SENS:ESP%d:RANG2:LIM1:ABS:STAR -37" % (i+1))
-        v.send_cmd("SENS:ESP%d:RANG2:LIM1:ABS:STOP -30" % (i+1))
-        v.send_cmd("SENS:ESP%d:RANG6:LIM1:ABS:STAR -30" % (i+1))
-        v.send_cmd("SENS:ESP%d:RANG6:LIM1:ABS:STOP -37" % (i+1))
+            v.send_cmd("SENS:ESP%d:RANG%d:INP:ATT %d" % ((i + 1), (j + 1), atten))
+        v.send_cmd("SENS:ESP%d:RANG2:LIM1:ABS:STAR -37" % (i + 1))
+        v.send_cmd("SENS:ESP%d:RANG2:LIM1:ABS:STOP -30" % (i + 1))
+        v.send_cmd("SENS:ESP%d:RANG6:LIM1:ABS:STAR -30" % (i + 1))
+        v.send_cmd("SENS:ESP%d:RANG6:LIM1:ABS:STOP -37" % (i + 1))
 
     if gap == "0":
         num = 4
     else:
         num = 8
-        v.send_cmd("SENS:ESP1:RANG5:FREQ:STOP %d" % ((float(bw2)/2 + float(gap)/2) * 1e6))
-        v.send_cmd("SENS:ESP2:RANG1:FREQ:STAR -%d" % ((float(bw1)/2 + float(gap)/2) * 1e6))
+        v.send_cmd("SENS:ESP1:RANG5:FREQ:STOP %d" % ((float(bw2) / 2 + float(gap) / 2) * 1e6))
+        v.send_cmd("SENS:ESP2:RANG1:FREQ:STAR -%d" % ((float(bw1) / 2 + float(gap) / 2) * 1e6))
 
     # v.send_cmd("INIT:CONT OFF")
     v.send_cmd("INIT;*WAI")
     time.sleep(delay)
 
-    if snap:
+    if snappath is not None:
         v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
         v.send_cmd("HCOP:DEV:LANG1 JPG")
         v.send_cmd("HCOP:CMAP:DEF4")
@@ -858,9 +875,9 @@ def lte_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
 
 
 def nr5g_acp(v: VisaConnection, rf_params: Dict[str, str],
-              rel: float = 25, atten: int = 5,
-              current: str = None, rename: str = None,
-              exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 20) -> List[float]:
+             rel: float = 25, atten: int = 5,
+             current: str = None, rename: str = None,
+             exs: bool = False, snappath: str = None, delay: int = 20) -> List[float]:
     """
     INST:CRE:NEW NR5G, '5G NR'
     :param v:
@@ -870,7 +887,6 @@ def nr5g_acp(v: VisaConnection, rf_params: Dict[str, str],
     :param current:
     :param rename:
     :param exs:
-    :param snap:
     :param snappath:
     :param delay:
     :return:
@@ -911,7 +927,7 @@ def nr5g_acp(v: VisaConnection, rf_params: Dict[str, str],
     # v.send_cmd("INIT;*WAI")
     time.sleep(delay)
 
-    if snap:
+    if snappath is not None:
         v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
         v.send_cmd("HCOP:DEV:LANG1 JPG")
         v.send_cmd("HCOP:CMAP:DEF4")
@@ -923,9 +939,9 @@ def nr5g_acp(v: VisaConnection, rf_params: Dict[str, str],
 
 
 def nr5g_multi_acp(v: VisaConnection, rf_params: Dict[str, str],
-                    rel: float = 25, atten: int = 5,
-                    current: str = None, rename: str = None,
-                    exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 20) -> List[float]:
+                   rel: float = 25, atten: int = 5,
+                   current: str = None, rename: str = None,
+                   exs: bool = False, snappath: str = None, delay: int = 20) -> List[float]:
     """
 
     :param v:
@@ -935,7 +951,6 @@ def nr5g_multi_acp(v: VisaConnection, rf_params: Dict[str, str],
     :param current:
     :param rename:
     :param exs:
-    :param snap:
     :param snappath:
     :param delay:
     :return:
@@ -1006,7 +1021,7 @@ def nr5g_multi_acp(v: VisaConnection, rf_params: Dict[str, str],
     # v.send_cmd("INIT;*WAI")
     time.sleep(delay)
 
-    if snap:
+    if snappath is not None:
         v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
         v.send_cmd("HCOP:DEV:LANG1 JPG")
         v.send_cmd("HCOP:CMAP:DEF4")
@@ -1023,7 +1038,7 @@ def nr5g_multi_acp(v: VisaConnection, rf_params: Dict[str, str],
 def nr5g_evm(v: VisaConnection, rf_params: Dict[str, str],
              rel: float = 25, atten: int = 20,
              current: str = None, rename: str = None,
-             exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[List[float]]:
+             exs: bool = False, snappath: str = None, delay: int = 5) -> List[List[float]]:
     """
     INST:CRE:NEW NR5G, '5G NR'
     :param v:
@@ -1033,7 +1048,6 @@ def nr5g_evm(v: VisaConnection, rf_params: Dict[str, str],
     :param current:
     :param rename:
     :param exs:
-    :param snap:
     :param snappath:
     :param delay:
     :return:
@@ -1081,7 +1095,7 @@ def nr5g_evm(v: VisaConnection, rf_params: Dict[str, str],
     # v.send_cmd("INIT;*WAI")
     time.sleep(delay)
 
-    if snap:
+    if snappath is not None:
         v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
         v.send_cmd("HCOP:DEV:LANG1 JPG")
         v.send_cmd("HCOP:CMAP:DEF4")
@@ -1141,7 +1155,7 @@ def nr5g_evm(v: VisaConnection, rf_params: Dict[str, str],
 def nr5g_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
                    rel: float = 25, atten: int = 20,
                    current: str = None, rename: str = None,
-                   exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 5) -> List[List[float]]:
+                   exs: bool = False, snappath: str = None, delay: int = 5) -> List[List[float]]:
     """
     INST:CRE:NEW NR5G, '5G NR'
     :param v:
@@ -1151,7 +1165,6 @@ def nr5g_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
     :param current:
     :param rename:
     :param exs:
-    :param snap:
     :param snappath:
     :param delay:
     :return:
@@ -1205,7 +1218,6 @@ def nr5g_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
     # MMEM:LOAD:TMOD:CC2 'NR-FR1-TM3_1a__TDD_100MHz_30kHz'
     # CONF:NR5G:DL:CC2:RFUC:STAT OFF
 
-
     if exs:
         v.send_cmd("TRIG:SOUR EXT")
     v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
@@ -1220,7 +1232,7 @@ def nr5g_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
     # v.send_cmd("INIT;*WAI")
     time.sleep(delay)
 
-    if snap:
+    if snappath is not None:
         v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
         v.send_cmd("HCOP:DEV:LANG1 JPG")
         v.send_cmd("HCOP:CMAP:DEF4")
@@ -1283,7 +1295,7 @@ def nr5g_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
 def nr5g_sem(v: VisaConnection, rf_params: Dict[str, str],
              rel: float = 25, atten: int = 15,
              current: str = None, rename: str = None,
-             exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 30) -> List[float]:
+             exs: bool = False, snappath: str = None, delay: int = 30) -> List[float]:
     """
 
     :param v:
@@ -1293,7 +1305,6 @@ def nr5g_sem(v: VisaConnection, rf_params: Dict[str, str],
     :param current:
     :param rename:
     :param exs:
-    :param snap:
     :param snappath:
     :param delay:
     :return:
@@ -1330,8 +1341,8 @@ def nr5g_sem(v: VisaConnection, rf_params: Dict[str, str],
 
     v.send_cmd("SENS:ESP1:RANG2:DEL")
     v.send_cmd("SENS:ESP1:RANG5:DEL")
-    v.send_cmd("SENS:ESP1:RANG1:FREQ:STOP -%d" % int((float(bandwidth)/2 + 5.05) * 1e6))
-    v.send_cmd("SENS:ESP1:RANG5:FREQ:STAR %d" % int((float(bandwidth)/2 + 5.05) * 1e6))
+    v.send_cmd("SENS:ESP1:RANG1:FREQ:STOP -%d" % int((float(bandwidth) / 2 + 5.05) * 1e6))
+    v.send_cmd("SENS:ESP1:RANG5:FREQ:STAR %d" % int((float(bandwidth) / 2 + 5.05) * 1e6))
 
     for i in range(5):
         v.send_cmd("SENS:ESP1:RANG%d:INP:ATT %d" % ((i + 1), atten))
@@ -1344,7 +1355,7 @@ def nr5g_sem(v: VisaConnection, rf_params: Dict[str, str],
     v.send_cmd("INIT;*WAI")
     time.sleep(delay)
 
-    if snap:
+    if snappath is not None:
         v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
         v.send_cmd("HCOP:DEV:LANG1 JPG")
         v.send_cmd("HCOP:CMAP:DEF4")
@@ -1365,7 +1376,7 @@ def nr5g_sem(v: VisaConnection, rf_params: Dict[str, str],
 def nr5g_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
                    rel: float = 25, atten: int = 15,
                    current: str = None, rename: str = None,
-                   exs: bool = False, snap: bool = False, snappath: str = None, delay: int = 50) -> List[float]:
+                   exs: bool = False, snappath: str = None, delay: int = 50) -> List[float]:
     """
 
     :param v:
@@ -1375,7 +1386,6 @@ def nr5g_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
     :param current:
     :param rename:
     :param exs:
-    :param snap:
     :param snappath:
     :param delay:
     :return:
@@ -1425,30 +1435,30 @@ def nr5g_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
         r"SENS:ESP2:PRES:STAN 'C:\R_S\Instr\sem_std\NR5G\NR5G_SEM_DL_LocalArea_BW%s_BASESTATIONTYPE_1_C_FSW.xml'" % bw2)
 
     for i, bw in enumerate((bw1, bw2)):
-        v.send_cmd("SENS:ESP%d:RANG2:DEL" % (i+1))
-        v.send_cmd("SENS:ESP%d:RANG5:DEL" % (i+1))
-        v.send_cmd("SENS:ESP%d:RANG1:FREQ:STOP -%d" % (i+1, int((float(bw)/2 + 5.05) * 1e6)))
-        v.send_cmd("SENS:ESP%d:RANG5:FREQ:STAR %d" % (i+1, int((float(bw)/2 + 5.05) * 1e6)))
+        v.send_cmd("SENS:ESP%d:RANG2:DEL" % (i + 1))
+        v.send_cmd("SENS:ESP%d:RANG5:DEL" % (i + 1))
+        v.send_cmd("SENS:ESP%d:RANG1:FREQ:STOP -%d" % (i + 1, int((float(bw) / 2 + 5.05) * 1e6)))
+        v.send_cmd("SENS:ESP%d:RANG5:FREQ:STAR %d" % (i + 1, int((float(bw) / 2 + 5.05) * 1e6)))
 
         for j in range(5):
-            v.send_cmd("SENS:ESP%d:RANG%d:INP:ATT %d" % (i+1, j+1, atten))
-        v.send_cmd("SENS:ESP%d:RANG2:LIM1:ABS:STAR -37" % (i+1))
-        v.send_cmd("SENS:ESP%d:RANG2:LIM1:ABS:STOP -30" % (i+1))
-        v.send_cmd("SENS:ESP%d:RANG4:LIM1:ABS:STAR -30" % (i+1))
-        v.send_cmd("SENS:ESP%d:RANG4:LIM1:ABS:STOP -37" % (i+1))
+            v.send_cmd("SENS:ESP%d:RANG%d:INP:ATT %d" % (i + 1, j + 1, atten))
+        v.send_cmd("SENS:ESP%d:RANG2:LIM1:ABS:STAR -37" % (i + 1))
+        v.send_cmd("SENS:ESP%d:RANG2:LIM1:ABS:STOP -30" % (i + 1))
+        v.send_cmd("SENS:ESP%d:RANG4:LIM1:ABS:STAR -30" % (i + 1))
+        v.send_cmd("SENS:ESP%d:RANG4:LIM1:ABS:STOP -37" % (i + 1))
 
     if gap == "0":
         num = 4
     else:
         num = 8
-        v.send_cmd("SENS:ESP1:RANG5:FREQ:STOP %d" % ((float(bw2)/2 + float(gap)/2) * 1e6))
-        v.send_cmd("SENS:ESP2:RANG1:FREQ:STAR -%d" % ((float(bw1)/2 + float(gap)/2) * 1e6))
+        v.send_cmd("SENS:ESP1:RANG5:FREQ:STOP %d" % ((float(bw2) / 2 + float(gap) / 2) * 1e6))
+        v.send_cmd("SENS:ESP2:RANG1:FREQ:STAR -%d" % ((float(bw1) / 2 + float(gap) / 2) * 1e6))
 
     # v.send_cmd("INIT:CONT OFF")
     v.send_cmd("INIT;*WAI")
     time.sleep(delay)
 
-    if snap:
+    if snappath is not None:
         v.send_cmd("HCOP:DEST 'SYST:COMM:MMEM'")
         v.send_cmd("HCOP:DEV:LANG1 JPG")
         v.send_cmd("HCOP:CMAP:DEF4")
