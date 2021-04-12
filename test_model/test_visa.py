@@ -8,7 +8,7 @@ v = VisaConnection("TCPIP0::192.168.0.130::inst0::INSTR", timeout=100000)
 # res = lte_multi_sem(v, rf_params)
 # for i in res:
 #     print(res)
-v.send_cmd("SENS:SWE:EGAT ON")
+v.send_cmd("LAY:SPL 1,2,39")
 # v.send_cmd("SWE:EGAT:TRAC1:PER 4.61536ms")
 # v.send_cmd("SWE:EGAT:TRAC1:STAR1 15us")
 # v.send_cmd("SWE:EGAT:TRAC1:STOP1 557.8us")

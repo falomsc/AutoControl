@@ -63,12 +63,12 @@
 <!--                <freq power="24">3575</freq>-->
 <!--                <freq power="24">3600</freq>-->
 <!--            </branch>-->
-            <branch id="1">
-                <loss>29.6</loss>
-                <freq power="24">3550</freq>
-                <freq power="24">3575</freq>
-                <freq power="24">3600</freq>
-            </branch>
+<!--            <branch id="1">-->
+<!--                <loss>29.6</loss>-->
+<!--                <freq power="24">3550</freq>-->
+<!--                <freq power="24">3575</freq>-->
+<!--                <freq power="24">3600</freq>-->
+<!--            </branch>-->
             <branch id="2">
                 <loss>29.6</loss>
                 <freq power="24">3550</freq>

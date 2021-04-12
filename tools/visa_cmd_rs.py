@@ -31,12 +31,12 @@ def obw(v: VisaConnection, rf_params: Dict[str, str],
     freq = rf_params.get('freq')
     loss = rf_params.get('loss')
     bandwidth = rf_params.get('bandwidth')
+
     if span is None:
         # span = float(int(bandwidth) * 1.5)
         span = float(bandwidth)
     if point is None:
         point = int(bandwidth) * 50 + 1
-
     if current is not None:
         v.send_cmd("INST '%s'" % current)
         if rename is not None:
@@ -48,11 +48,11 @@ def obw(v: VisaConnection, rf_params: Dict[str, str],
         v.send_cmd("TRIG:SOUR EXT")
         v.send_cmd("SENS:SWE:EGAT ON")
         v.send_cmd("SENS:SWE:OPT SPE")
+
     v.send_cmd("FREQ:CENT %sMHz" % freq)
     v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
     v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
     v.send_cmd("INP:ATT %ddB" % atten)
-
     v.send_cmd("DISP:TRAC1:MODE AVER")
     v.send_cmd("DET RMS")
     v.send_cmd("POW:ACH:BAND %sMHz" % bandwidth)
@@ -123,6 +123,7 @@ def multi_obw(v: VisaConnection, rf_params: Dict[str, str], span1: int = None, s
     rf_params2['bandwidth'] = bw1
     rf_params1['freq'] = freq1
     rf_params2['freq'] = freq2
+
     res = [obw(v, rf_params1, span1, rel, atten, rbw, count1, point1, current1, rename1, exs, snappath1, delay),
            obw(v, rf_params2, span2, rel, atten, rbw, count2, point2, current2, rename2, exs, snappath2, delay)]
     return res
@@ -163,11 +164,11 @@ def ccdf(v: VisaConnection, rf_params: Dict[str, str], abw: int,
     if exs:
         v.send_cmd("TRIG:SOUR EXT")
         v.send_cmd("SENS:SWE:EGAT ON")
+
     v.send_cmd("FREQ:CENT %sMHz" % freq)
     v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
     v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
     v.send_cmd("INP:ATT %ddB" % atten)
-
     v.send_cmd("BAND %d MHz" % abw)
     v.send_cmd("CALC1:STAT:NSAM %d" % samp_num)
 
@@ -242,6 +243,7 @@ def se(v: VisaConnection, rf_params: Dict[str, str],
         v.send_cmd("TRIG:SOUR EXT")
         v.send_cmd("SENS:SWE:EGAT ON")
         v.send_cmd("SENS:SWE:EGAT:CONT:STAT ON")
+
     v.send_cmd("FREQ:CENT %sMHz" % freq)
     v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
     v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
@@ -478,7 +480,6 @@ def lte_evm(v: VisaConnection, rf_params: Dict[str, str],
     v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
     v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
     v.send_cmd("INP:ATT %ddB" % atten)
-
     v.send_cmd("LAY:REM:WIND '3'")
     v.send_cmd("LAY:ADD:WIND? '5',LEFT,EVSY")
 
@@ -610,6 +611,7 @@ def lte_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
 
     if exs:
         v.send_cmd("TRIG:SOUR EXT")
+
     v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
     v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
     v.send_cmd("INP:ATT %ddB" % atten)
@@ -740,7 +742,6 @@ def lte_sem(v: VisaConnection, rf_params: Dict[str, str],
     v.send_cmd("SENS:ESP1:RANG1:FREQ:STOP -%d" % int((float(bandwidth) / 2 + 5.05) * 1e6))
     v.send_cmd("SENS:ESP1:RANG7:FREQ:STAR %d" % int((float(bandwidth) / 2 + 5.05) * 1e6))
     v.send_cmd("SENS:ESP1:RANG7:FREQ:STAR %d" % int((float(bandwidth) / 2 + 5.05) * 1e6))
-
     for i in range(7):
         v.send_cmd("SENS:ESP1:RANG%d:INP:ATT %d" % ((i + 1), atten))
     v.send_cmd("SENS:ESP1:RANG2:LIM1:ABS:STAR -37")
@@ -835,14 +836,12 @@ def lte_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
         v.send_cmd("SENS:ESP%d:RANG1:FREQ:STOP -%d" % (i + 1, int((float(bw) / 2 + 5.05) * 1e6)))
         v.send_cmd("SENS:ESP%d:RANG7:FREQ:STAR %d" % (i + 1, int((float(bw) / 2 + 5.05) * 1e6)))
         v.send_cmd("SENS:ESP%d:RANG7:FREQ:STAR %d" % (i + 1, int((float(bw) / 2 + 5.05) * 1e6)))
-
         for j in range(7):
             v.send_cmd("SENS:ESP%d:RANG%d:INP:ATT %d" % ((i + 1), (j + 1), atten))
         v.send_cmd("SENS:ESP%d:RANG2:LIM1:ABS:STAR -37" % (i + 1))
         v.send_cmd("SENS:ESP%d:RANG2:LIM1:ABS:STOP -30" % (i + 1))
         v.send_cmd("SENS:ESP%d:RANG6:LIM1:ABS:STAR -30" % (i + 1))
         v.send_cmd("SENS:ESP%d:RANG6:LIM1:ABS:STOP -37" % (i + 1))
-
     if gap == "0":
         num = 4
     else:
@@ -915,11 +914,11 @@ def nr5g_acp(v: VisaConnection, rf_params: Dict[str, str],
     if exs:
         v.send_cmd("TRIG:SOUR EXT")
         v.send_cmd("SENS:SWE:EGAT ON")
+
     v.send_cmd("FREQ:CENT %sMHz" % freq)
     v.send_cmd("DISP:TRAC:Y:RLEV:OFFS %sdB" % loss)
     v.send_cmd("DISP:TRAC:Y:RLEV %fdBm" % rel)
     v.send_cmd("INP:ATT %ddB" % atten)
-
     v.send_cmd("SENS:SWE:OPT SPE")
     v.send_cmd("SENS:SWE:TIME 0.005")
 
@@ -1016,6 +1015,7 @@ def nr5g_multi_acp(v: VisaConnection, rf_params: Dict[str, str],
 
     v.send_cmd("SENS:SWE:OPT SPE")
     v.send_cmd("SENS:SWE:TIME 0.005")
+    v.send_cmd("LAY:SPL 1,2,39")
 
     # v.send_cmd("INIT:CONT OFF")
     # v.send_cmd("INIT;*WAI")
@@ -1343,7 +1343,6 @@ def nr5g_sem(v: VisaConnection, rf_params: Dict[str, str],
     v.send_cmd("SENS:ESP1:RANG5:DEL")
     v.send_cmd("SENS:ESP1:RANG1:FREQ:STOP -%d" % int((float(bandwidth) / 2 + 5.05) * 1e6))
     v.send_cmd("SENS:ESP1:RANG5:FREQ:STAR %d" % int((float(bandwidth) / 2 + 5.05) * 1e6))
-
     for i in range(5):
         v.send_cmd("SENS:ESP1:RANG%d:INP:ATT %d" % ((i + 1), atten))
     v.send_cmd("SENS:ESP1:RANG2:LIM1:ABS:STAR -37")
@@ -1446,7 +1445,6 @@ def nr5g_multi_sem(v: VisaConnection, rf_params: Dict[str, str],
         v.send_cmd("SENS:ESP%d:RANG2:LIM1:ABS:STOP -30" % (i + 1))
         v.send_cmd("SENS:ESP%d:RANG4:LIM1:ABS:STAR -30" % (i + 1))
         v.send_cmd("SENS:ESP%d:RANG4:LIM1:ABS:STOP -37" % (i + 1))
-
     if gap == "0":
         num = 4
     else:
