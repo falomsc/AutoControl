@@ -15,7 +15,6 @@ def obw(v: VisaConnection, rf_params: Dict[str, str],
     INST:CRE:NEW SANALYZER, 'Spectrum'
     :param v: VisaConnection
     :param rf_params: should add temp and mode
-    rf_params =
     :param span: Span (MHz)
     :param rel: Ref Level (dBm)
     :param atten: RF Atten Manual (dB)
@@ -59,6 +58,7 @@ def obw(v: VisaConnection, rf_params: Dict[str, str],
     v.send_cmd("POW:ACH:BAND %sMHz" % bandwidth)
     v.send_cmd("FREQ:SPAN %fMHz" % span)
     v.send_cmd("BAND %d kHz" % rbw)
+    v.send_cmd("SENS:SWE:OPT AUTO")
     v.send_cmd("SWE:COUN %d" % count)
     v.send_cmd("SWE:POIN %d" % point)
 
@@ -1155,7 +1155,7 @@ def nr5g_evm(v: VisaConnection, rf_params: Dict[str, str],
 def nr5g_multi_evm(v: VisaConnection, rf_params: Dict[str, str],
                    rel: float = 25, atten: int = 20,
                    current: str = None, rename: str = None,
-                   exs: bool = False, snappath: str = None, delay: int = 5) -> List[List[float]]:
+                   exs: bool = False, snappath: str = None, delay: int = 10) -> List[List[float]]:
     """
     INST:CRE:NEW NR5G, '5G NR'
     :param v:

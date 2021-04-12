@@ -9,7 +9,7 @@ if __name__ == '__main__':
     s = SSHConnection(hostname=hostname, port=port, username=username, password=password)
     v = VisaConnection(address=address)
     fr = FillReport("./report/model.xlsx")
-    mode = 'TM3_1'
+    mode = 'TM3_1A'
     abw_dict = {"5": 20, "20": 80, "40": 120, "50": 120, "60": 120, "70": 160, "100": 240, "200": 320}
     tx_bandwidth_list = get_xstep_tx_config("./config/5G_config.xml")
     for tx_pipe_list in tx_bandwidth_list:
@@ -23,10 +23,10 @@ if __name__ == '__main__':
                     res_basic = [rf_params.get('mode'), rf_params.get('bandwidth'), int(rf_params.get('pipe')),
                                  int(rf_params.get('branch')), float(rf_params.get('freq')),
                                  float(rf_params.get('power'))]
-                    res_madura = get_clgc_and_pa_temperature(s, rf_params)
                     ############## notion ##############
-                    input("Please conform the information: branch: {branch}, freq: {freq}, mode: {mode}, bw: {bandwidth}".format(**rf_params))
+                    input("\nPlease conform the information: branch: {branch}, freq: {freq}, mode: {mode}, bandwidth: {bandwidth}\n".format(**rf_params))
 
+                    res_madura = get_clgc_and_pa_temperature(s, rf_params)
                     ############## 2 Carriers ##############
                     if bandwidth.find('+') > -1:
                         bw1 = re.match("(.\d+)", bandwidth).group(1)
@@ -48,12 +48,11 @@ if __name__ == '__main__':
                             # OBW
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'OBW1'")
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'OBW2'")
-                            res_obw = multi_obw(v, rf_params, current1="OBW1", current2="OBW2", exs=True,
+                            res_obw = multi_obw(v, rf_params, current1="OBW1", current2="OBW2", exs=True, delay=20,
                                                 snappath1="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_2_1.JPG".format(**rf_params),
                                                 snappath2="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_2_2.JPG".format(**rf_params))
                             # CCDF
-                            v.send_cmd("INST:CRE:NEW SANALYZER, 'CCDF'")
-                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF", samp_num=1000000, exs=True,
+                            res_ccdf = ccdf(v, rf_params, abw, current="Spectrum",rename="CCDF", samp_num=1000000, exs=True,
                                             snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_3.JPG".format(**rf_params))
                             # EVM
                             v.send_cmd("INST:CRE:NEW NR5G, 'EVM'")
@@ -92,8 +91,7 @@ if __name__ == '__main__':
                                                 snappath1="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_2_1.JPG".format(**rf_params),
                                                 snappath2="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_2_2.JPG".format(**rf_params))
                             # CCDF
-                            v.send_cmd("INST:CRE:NEW SANALYZER, 'CCDF'")
-                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF",
+                            res_ccdf = ccdf(v, rf_params, abw, current="Spectrum", rename="CCDF",
                                             snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_3.JPG".format(**rf_params))
                             # EVM
                             v.send_cmd("NST:CRE:NEW LTE, 'EVM'")
@@ -127,15 +125,14 @@ if __name__ == '__main__':
                             # ACP
                             v.send_cmd("*RST")
                             v.send_cmd("INST:CRE:NEW NR5G, 'ACP'")
-                            res_acp = nr5g_acp(v, rf_params, current="ACP", exs=True,
+                            res_acp = nr5g_acp(v, rf_params, current="ACP", exs=True, delay=20,
                                                snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_1.JPG".format(**rf_params))
                             # OBW
                             v.send_cmd("INST:CRE:NEW SANALYZER, 'OBW'")
                             res_obw = obw(v, rf_params, current="OBW", exs=True,
                                           snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_2.JPG".format(**rf_params))
                             # CCDF
-                            v.send_cmd("INST:CRE:NEW SANALYZER, 'CCDF'")
-                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF", samp_num=1000000, exs=True,
+                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF", rename="CCDF", samp_num=1000000, exs=True,
                                             snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_3.JPG".format(**rf_params))
                             # EVM
                             v.send_cmd("INST:CRE:NEW NR5G, 'EVM'")
@@ -172,8 +169,7 @@ if __name__ == '__main__':
                             res_obw = obw(v, rf_params, current="OBW",
                                           snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_2.JPG".format(**rf_params))
                             # CCDF
-                            v.send_cmd("INST:CRE:NEW SANALYZER, 'CCDF'")
-                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF",
+                            res_ccdf = ccdf(v, rf_params, abw, current="CCDF", rename="CCDF",
                                             snappath="C:\\Xstep\\{bandwidth}\\pipe{pipe}\\{branch}_{mode}_{freq}_{power}_3.JPG".format(**rf_params))
                             # EVM
                             v.send_cmd("INST:CRE:NEW LTE, 'EVM'")
